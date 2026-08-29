@@ -1,0 +1,12 @@
+{
+  "processed_ticks": 500000,
+  "ticks_per_second": 38279100,
+  "total_return_pct": -3.83156,
+  "raw_per_era_sharpe": -0.0355275,
+  "annualized_sharpe": -6.76779,
+  "max_drawdown_pct": 4.00075,
+  "total_trades": 516,
+  "win_rate_pct": 51.1628,
+  "profit_factor": 0.768719,
+  "nasa_power_of_10_compliant": true
+}
