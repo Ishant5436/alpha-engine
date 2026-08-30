@@ -29,6 +29,10 @@ int main(int argc, char* argv[]) {
     file.close();
 
     std::cout << "Loaded " << ticks.size() << " market ticks from '" << filename << "'\n";
+    if (ticks.empty()) {
+        std::cout << "Warning: 0 market ticks loaded from '" << filename << "' - backtest skipped.\n";
+        return 0;
+    }
 
     alpha::Backtester backtester(
         10000.0,  // Initial Capital ($10,000)
