@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
         double price = 0.0, qty = 0.0;
         std::string side_str;
 
-        if (!(ss >> ts_ms >> price >> qty >> side_str)) {
+        if (!(ss >> ts_ms >> price >> qty >> side_str) || price <= 0.0 || qty <= 0.0) {
             continue;
         }
 
