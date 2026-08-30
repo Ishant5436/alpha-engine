@@ -85,3 +85,14 @@ make all
 
 ## License
 MIT License. Open source for quantitative development and Web3 infrastructure.
+
+## Real-Time Forward Paper Trading (Binance Spot Live Feed)
+
+Stream real-world trade ticks in real-time from Binance Spot directly into the zero-heap C++ ring buffer:
+
+```bash
+# Build and launch live paper trader on BTC/USDT (or ETHUSDT, SOLUSDT, BNBUSDT)
+python3 scripts/run_live_paper_trader.py BTCUSDT 10000.0
+```
+
+Features real-time Parkinson volatility calculation, triple-horizon trend alignment, and simulated execution with 4.0 bps taker fee modeling in a live ANSI terminal dashboard.
