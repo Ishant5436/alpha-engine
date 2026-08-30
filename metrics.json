@@ -1,11 +1,12 @@
 {
-  "processed_ticks": 500000,
-  "ticks_per_second": 125747948,
-  "total_return_pct": 12.0415,
-  "raw_per_era_sharpe": 0.0778184,
-  "annualized_sharpe": 14.8239,
-  "max_drawdown_pct": 1.58264,
-  "total_trades": 165,
-  "win_rate_pct": 37.5758,
-  "profit_factor": 2.12356
+  "processed_ticks": 100000,
+  "ticks_per_second": 21708262,
+  "total_return_pct": 0,
+  "raw_per_era_sharpe": 0,
+  "annualized_sharpe": 0,
+  "max_drawdown_pct": 0,
+  "total_trades": 0,
+  "win_rate_pct": 0,
+  "profit_factor": 1,
+  "taker_fee_bps": 4.0
 }

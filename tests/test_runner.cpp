@@ -17,12 +17,12 @@ void test_end_to_end_backtester() {
 
     double price = 100.0;
     for (uint64_t i = 0; i < 5000; ++i) {
-        double delta = (i % 200 < 100) ? 0.05 : -0.04;
+        double delta = (i % 300 < 150) ? 0.08 : -0.06;
         price += delta;
         ticks.push_back({
             i * 1000000ULL, // 1ms
-            price - 0.01,
-            price + 0.01,
+            price - 0.02,
+            price + 0.02,
             5.0,
             5.0,
             price,
@@ -30,7 +30,7 @@ void test_end_to_end_backtester() {
         });
     }
 
-    alpha::Backtester bt(10000.0, 0.005, 0.0005, 0.04, 1.0);
+    alpha::Backtester bt(10000.0, 0.08, 0.02, 0.005, 0.04, 1.0);
     auto metrics = bt.run(ticks.data(), ticks.size());
 
     assert(metrics.processed_ticks == 5000);

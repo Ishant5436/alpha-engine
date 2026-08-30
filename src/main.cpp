@@ -10,7 +10,7 @@
 #include "backtester.hpp"
 
 int main(int argc, char* argv[]) {
-    const std::string filename = (argc > 1) ? argv[1] : "data/ticks_500k.bin";
+    const std::string filename = (argc > 1) ? argv[1] : "data/real_btc_ticks.bin";
 
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<alpha::Tick> ticks;
-    ticks.reserve(500000);
+    ticks.reserve(100000);
 
     alpha::Tick t{};
     while (file.read(reinterpret_cast<char*>(&t), sizeof(alpha::Tick))) {
@@ -31,8 +31,9 @@ int main(int argc, char* argv[]) {
 
     alpha::Backtester backtester(
         10000.0,  // Initial Capital ($10,000)
-        0.005,    // Fast EMA alpha (half-life ~140 ticks)
-        0.0005,   // Slow EMA alpha (half-life ~1400 ticks)
+        0.0392,   // Fast EMA alpha (50 ticks)
+        0.00797,  // Medium EMA alpha (250 ticks)
+        0.00160,  // Slow EMA alpha (1250 ticks)
         0.04,     // 4.0% Max Drawdown Kill-Switch
         1.0       // 1.0x Safe Leverage
     );
@@ -52,6 +53,7 @@ int main(int argc, char* argv[]) {
     std::cout << "  Total Executed Trades    : " << metrics.total_trades << "\n";
     std::cout << "  Win Rate (%)             : " << std::setprecision(2) << metrics.win_rate_pct << "%\n";
     std::cout << "  Profit Factor            : " << std::setprecision(2) << metrics.profit_factor << "\n";
+    std::cout << "  Exchange Taker Fee Rate  : 4.0 bps per fill\n";
     std::cout << "=============================================================\n";
 
     // Write metrics.json for programmatic verification
@@ -66,7 +68,8 @@ int main(int argc, char* argv[]) {
         json_out << "  \"max_drawdown_pct\": " << metrics.max_drawdown_pct << ",\n";
         json_out << "  \"total_trades\": " << metrics.total_trades << ",\n";
         json_out << "  \"win_rate_pct\": " << metrics.win_rate_pct << ",\n";
-        json_out << "  \"profit_factor\": " << metrics.profit_factor << "\n";
+        json_out << "  \"profit_factor\": " << metrics.profit_factor << ",\n";
+        json_out << "  \"taker_fee_bps\": 4.0\n";
         json_out << "}\n";
         json_out.close();
     }

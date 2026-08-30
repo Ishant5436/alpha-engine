@@ -14,11 +14,12 @@ namespace alpha {
 class Backtester {
 public:
     constexpr explicit Backtester(double initial_capital = 10000.0,
-                                  double fast_alpha = 0.005,
-                                  double slow_alpha = 0.0005,
+                                  double fast_alpha = 0.0392,
+                                  double med_alpha = 0.00797,
+                                  double slow_alpha = 0.00160,
                                   double max_drawdown = MAX_DRAWDOWN_THRESHOLD,
                                   double max_leverage = 1.0) noexcept
-        : ring_(), alpha_engine_(fast_alpha, slow_alpha),
+        : ring_(), alpha_engine_(fast_alpha, med_alpha, slow_alpha),
           risk_manager_(initial_capital, max_drawdown, max_leverage),
           initial_capital_(initial_capital) {
         assert(initial_capital_ > 0.0);
@@ -36,6 +37,7 @@ public:
         double gross_loss = 0.0;
         double prev_equity = initial_capital_;
         double max_observed_dd_pct = 0.0;
+        double peak_trade_price = 0.0;
 
         double sum_returns = 0.0;
         double sum_sq_returns = 0.0;
@@ -57,26 +59,37 @@ public:
             if (signal.is_valid && !risk_manager_.position().is_liquidated) {
                 const double current_size = risk_manager_.position().size;
                 const double mid = tick.mid_price();
-                const double unit_size = (current_eq * 1.0) / mid; // 1.0x safe leverage
-                double target_size = current_size;
+                const double unit_size = (current_eq * 1.0) / mid;
+                double desired_target = current_size;
 
                 if (current_size == 0.0) {
                     if (signal.composite_signal > 0.5) {
-                        target_size = unit_size;
+                        desired_target = unit_size;
+                        peak_trade_price = tick.ask_price;
                     } else if (signal.composite_signal < -0.5) {
-                        target_size = -unit_size;
+                        desired_target = -unit_size;
+                        peak_trade_price = tick.bid_price;
                     }
-                } else {
-                    const double unpnl = risk_manager_.position().unrealized_pnl;
-                    // Stop loss or trend reversal exit
-                    if (unpnl < -35.0 ||
-                        (current_size > 0.0 && signal.raw_trend_spread < 0.0) ||
-                        (current_size < 0.0 && signal.raw_trend_spread > 0.0)) {
-                        target_size = 0.0;
+                } else if (current_size > 0.0) {
+                    peak_trade_price = std::max(peak_trade_price, tick.bid_price);
+                    const double gain_bps = 10000.0 * (tick.bid_price - risk_manager_.position().entry_price) / risk_manager_.position().entry_price;
+                    const double drop_bps = 10000.0 * (peak_trade_price - tick.bid_price) / peak_trade_price;
+
+                    // Asymmetric 3:1 Exit: Stop-loss -15 bps, TP +50 bps, Trailing 15 bps
+                    if (gain_bps <= -15.0 || gain_bps >= 50.0 || (gain_bps > 20.0 && drop_bps >= 15.0) || (signal.fast_ema < signal.med_ema)) {
+                        desired_target = 0.0;
+                    }
+                } else if (current_size < 0.0) {
+                    peak_trade_price = (peak_trade_price == 0.0) ? tick.ask_price : std::min(peak_trade_price, tick.ask_price);
+                    const double gain_bps = 10000.0 * (risk_manager_.position().entry_price - tick.ask_price) / risk_manager_.position().entry_price;
+                    const double rise_bps = 10000.0 * (tick.ask_price - peak_trade_price) / peak_trade_price;
+
+                    if (gain_bps <= -15.0 || gain_bps >= 50.0 || (gain_bps > 20.0 && rise_bps >= 15.0) || (signal.fast_ema > signal.med_ema)) {
+                        desired_target = 0.0;
                     }
                 }
 
-                const double delta_size = target_size - current_size;
+                const double delta_size = desired_target - current_size;
                 if (std::abs(delta_size) > 0.001) {
                     const OrderSide side = (delta_size > 0.0) ? OrderSide::BUY : OrderSide::SELL;
                     const double fill_price = (side == OrderSide::BUY) ? tick.ask_price : tick.bid_price;
@@ -86,7 +99,7 @@ public:
                     risk_manager_.execute_fill(side, fill_price, trade_size);
                     const double trade_pnl = risk_manager_.position().realized_pnl - prev_realized;
 
-                    if (target_size == 0.0) {
+                    if (desired_target == 0.0) {
                         if (trade_pnl > 0.0) {
                             ++winning_trades;
                             gross_profit += trade_pnl;
