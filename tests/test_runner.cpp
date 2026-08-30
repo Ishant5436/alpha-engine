@@ -43,7 +43,7 @@ void test_end_to_end_backtester() {
 
 int main() {
     std::cout << "====================================================\n";
-    std::cout << "🚀 Running AlphaEngine Test Suite\n";
+    std::cout << "Running AlphaEngine Test Suite\n";
     std::cout << "====================================================\n";
 
     test_ring_buffer_push_and_vwap();
@@ -53,7 +53,7 @@ int main() {
     test_end_to_end_backtester();
 
     std::cout << "====================================================\n";
-    std::cout << "✅ All Unit Tests Passed!\n";
+    std::cout << "All Unit Tests Passed\n";
     std::cout << "====================================================\n";
     return 0;
 }

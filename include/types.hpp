@@ -6,7 +6,7 @@
 
 namespace alpha {
 
-// NASA Power of 10 Compile-Time Constants
+// Safety-Critical Compile-Time Constants
 constexpr std::size_t MAX_RING_CAPACITY = 2048;
 constexpr std::size_t MAX_ORDER_ITERATIONS = 10;
 constexpr double MAX_DRAWDOWN_THRESHOLD = 0.04;  // 4.0% hard stop

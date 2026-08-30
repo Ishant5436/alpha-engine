@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Mechanical NASA / JPL Power of 10 Static Analyzer
-Parses C++20 header and source files to mechanically verify Holzmann's rules:
+Mechanical Safety-Critical Static Analyzer
+Parses C++20 header and source files to mechanically verify deterministic systems invariants:
 - Rule 1: No goto, setjmp, longjmp, recursion
 - Rule 2: Bounded loops
 - Rule 3: No dynamic heap allocation (malloc/new/free)
@@ -37,7 +37,6 @@ def audit_file(filepath: str) -> list[dict]:
 
         # Rule 3: Check dynamic heap allocation keywords
         if re.search(r"\bmalloc\s*\(|\bcalloc\s*\(|\bfree\s*\(|\bnew\s+[a-zA-Z0-9_]+", line):
-            # Ignore comments
             if not line.startswith("//") and not line.startswith("*"):
                 issues.append({"rule": 3, "file": filename, "line": idx, "msg": f"Dynamic memory keyword found: {line}"})
 
@@ -50,7 +49,6 @@ def audit_file(filepath: str) -> list[dict]:
             issues.append({"rule": 9, "file": filename, "line": idx, "msg": f"Multiple pointer dereferencing found: {line}"})
 
         # Rule 4 & 5: Function boundary & assertion tracking
-        # Detect function header
         if re.search(r"(?:void|bool|double|uint64_t|std::size_t|PerformanceMetrics|AlphaSignal|const\s+Tick&|const\s+Position&)\s+([a-zA-Z0-9_:]+)\s*\(", raw_line):
             if brace_depth == 1 or brace_depth == 0:
                 in_function = True
@@ -67,10 +65,8 @@ def audit_file(filepath: str) -> list[dict]:
         brace_depth += raw_line.count("{") - raw_line.count("}")
 
         if in_function and brace_depth <= 1 and (raw_line.count("}") > 0 or func_lines > 1):
-            # Function completed
             if func_lines > 60:
                 issues.append({"rule": 4, "file": filename, "line": func_start_line, "msg": f"Function '{func_name}' length ({func_lines} lines) exceeds 60-line limit"})
-            # Check assertion density on non-trivial functions (> 5 lines)
             if func_lines > 5 and func_asserts < 2 and not func_name.startswith("test_"):
                 issues.append({"rule": 5, "file": filename, "line": func_start_line, "msg": f"Function '{func_name}' has only {func_asserts} assertions (minimum 2 required)"})
             in_function = False
@@ -92,24 +88,24 @@ def main():
                     analyzed_files += 1
 
     print("==================================================================")
-    print("🔬 Mechanical NASA / JPL Power of 10 Static Code Analyzer")
-    print(f"   Analyzed {analyzed_files} C++ source files across include/ and src/")
+    print("Static Code Safety Invariants Analyzer")
+    print(f"Analyzed {analyzed_files} C++ source files across include/ and src/")
     print("==================================================================")
 
     if not all_issues:
-        print("✅ Rule 1 (Control Flow): 0 goto / setjmp / longjmp found")
-        print("✅ Rule 2 (Bounded Loops): Static compile-time loop bounds verified")
-        print("✅ Rule 3 (Zero Heap): 0 dynamic allocation calls (malloc/new) on hot path")
-        print("✅ Rule 4 (Function Length): 100% of functions <= 60 lines")
-        print("✅ Rule 5 (Assertion Density): >= 2 assertions per function verified")
-        print("✅ Rule 8 (Preprocessor): 0 #define macros (100% C++20 constexpr)")
-        print("✅ Rule 9 (Pointer Safety): 0 multi-level pointer dereferences")
+        print("Rule 1 (Control Flow): 0 goto / setjmp / longjmp found")
+        print("Rule 2 (Bounded Loops): Static compile-time loop bounds verified")
+        print("Rule 3 (Zero Heap): 0 dynamic allocation calls (malloc/new) on hot path")
+        print("Rule 4 (Function Length): 100% of functions <= 60 lines")
+        print("Rule 5 (Assertion Density): >= 2 assertions per function verified")
+        print("Rule 8 (Preprocessor): 0 #define macros (100% C++20 constexpr)")
+        print("Rule 9 (Pointer Safety): 0 multi-level pointer dereferences")
         print("==================================================================")
-        print("🎉 100% MECHANICAL NASA POWER OF 10 AUDIT PASSED (0 Violations)")
+        print("Static Code Safety Audit: PASSED (0 Violations)")
         print("==================================================================")
         return 0
     else:
-        print(f"❌ Found {len(all_issues)} NASA Power of 10 Violations:")
+        print(f"Found {len(all_issues)} Safety Invariant Violations:")
         for issue in all_issues:
             print(f"  - [{issue['file']}:{issue['line']}] Rule {issue['rule']}: {issue['msg']}")
         return 1

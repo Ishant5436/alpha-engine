@@ -10,7 +10,7 @@ bin/alpha_engine: src/main.cpp
 
 test: bin/test_runner
 	@./bin/test_runner
-	@python3 scripts/audit_nasa_power_of_10.py
+	@python3 scripts/audit_safety_invariants.py
 
 bin/test_runner: tests/test_runner.cpp
 	@mkdir -p bin
