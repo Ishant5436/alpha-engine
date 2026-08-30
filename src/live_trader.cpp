@@ -13,9 +13,11 @@
 
 using namespace alpha;
 
+constexpr std::size_t MAX_FILL_HISTORY = 4096;
+
 struct PaperFill {
-    std::string timestamp;
-    std::string side;
+    const char* timestamp;
+    const char* side;
     double price{0.0};
     double qty{0.0};
     double fee{0.0};
@@ -35,6 +37,7 @@ int main(int argc, char* argv[]) {
     std::uint64_t total_trades = 0;
     std::uint64_t winning_trades = 0;
     std::vector<PaperFill> fill_history;
+    fill_history.reserve(MAX_FILL_HISTORY);
 
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(nullptr);
@@ -93,14 +96,16 @@ int main(int argc, char* argv[]) {
                 const double trade_pnl = pos.realized_pnl - prev_realized;
                 if (trade_pnl > 0.0) winning_trades++;
 
-                fill_history.push_back({
-                    (side == OrderSide::BUY ? "BUY" : "SELL"),
-                    (target_size > 0 ? "LONG" : (target_size < 0 ? "SHORT" : "FLAT")),
-                    fill_price,
-                    fill_qty,
-                    fill_price * fill_qty * TRADING_FEE_RATE,
-                    trade_pnl
-                });
+                if (fill_history.size() < MAX_FILL_HISTORY) {
+                    fill_history.push_back({
+                        (side == OrderSide::BUY ? "BUY" : "SELL"),
+                        (target_size > 0 ? "LONG" : (target_size < 0 ? "SHORT" : "FLAT")),
+                        fill_price,
+                        fill_qty,
+                        fill_price * fill_qty * TRADING_FEE_RATE,
+                        trade_pnl
+                    });
+                }
             }
         }
 

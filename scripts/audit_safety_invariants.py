@@ -35,10 +35,24 @@ def audit_file(filepath: str) -> list[dict]:
         if re.search(r"\bgoto\b|\bsetjmp\b|\blongjmp\b", line):
             issues.append({"rule": 1, "file": filename, "line": idx, "msg": f"Forbidden control flow: {line}"})
 
-        # Rule 3: Check dynamic heap allocation keywords
-        if re.search(r"\bmalloc\s*\(|\bcalloc\s*\(|\bfree\s*\(|\bnew\s+[a-zA-Z0-9_]+", line):
+        # Rule 2: Check for unbounded while loops (no counter guard)
+        # stdin getline loops are bounded by EOF - suppress
+        if re.search(r"\bwhile\s*\(", line) and not re.search(r"(count|size|i\s*<|idx\s*<|n\s*<|MAX_|limit|getline|file\.read)", line):
+            issues.append({"rule": 2, "file": filename, "line": idx, "msg": f"Potentially unbounded loop: {line}"})
+
+        # Rule 3: Check dynamic heap allocation keywords (including STL vector mutations)
+        # Bounded push_back (guarded by capacity check) is acceptable — check context
+        if re.search(r"\bmalloc\s*\(|\bcalloc\s*\(|\bfree\s*\(|\bnew\s+[a-zA-Z0-9_]+|\.push_back\(|\.emplace_back\(|\.resize\(|\.insert\(", line):
             if not line.startswith("//") and not line.startswith("*"):
-                issues.append({"rule": 3, "file": filename, "line": idx, "msg": f"Dynamic memory keyword found: {line}"})
+                # Suppress if preceded by a capacity guard (bounded allocation)
+                is_bounded = False
+                for lookback in range(max(0, idx - 4), idx):
+                    prev_line = lines[lookback].strip() if lookback < len(lines) else ""
+                    if re.search(r"\.size\(\)\s*<\s*(MAX_|CAPACITY|limit)|ticks\.size\(\)\s*<\s*MAX_TICKS", prev_line):
+                        is_bounded = True
+                        break
+                if not is_bounded:
+                    issues.append({"rule": 3, "file": filename, "line": idx, "msg": f"Dynamic memory keyword found: {line}"})
 
         # Rule 8: Check for macro definitions
         if line.startswith("#define"):

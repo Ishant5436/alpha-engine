@@ -19,10 +19,11 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<alpha::Tick> ticks;
+    constexpr std::size_t MAX_TICKS = 10000000;  // 10M tick safety cap (~560 MB)
     ticks.reserve(100000);
 
     alpha::Tick t{};
-    while (file.read(reinterpret_cast<char*>(&t), sizeof(alpha::Tick))) {
+    while (ticks.size() < MAX_TICKS && file.read(reinterpret_cast<char*>(&t), sizeof(alpha::Tick))) {
         ticks.push_back(t);
     }
     file.close();
