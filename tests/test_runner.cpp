@@ -30,25 +30,20 @@ void test_end_to_end_backtester() {
         });
     }
 
-    alpha::Backtester bt(10000.0, 0.20, 0.05, 0.001, 0.04, 2.5);
+    alpha::Backtester bt(10000.0, 0.005, 0.0005, 0.04, 1.0);
     auto metrics = bt.run(ticks.data(), ticks.size());
 
-    std::cout << "    Backtester Output: processed=" << metrics.processed_ticks
-              << ", ret=" << metrics.total_return_pct << "%, max_dd=" << metrics.max_drawdown_pct
-              << "%, sharpe=" << metrics.annualized_sharpe
-              << ", speed=" << static_cast<uint64_t>(metrics.ticks_per_second) << " ticks/sec\n";
-
     assert(metrics.processed_ticks == 5000);
-    assert(metrics.ticks_per_second > 1000000.0); // > 1M ticks/sec invariant
-    assert(metrics.max_drawdown_pct <= 6.0);      // Bounded drawdown ceiling
+    assert(metrics.ticks_per_second > 1000000.0);
+    assert(metrics.max_drawdown_pct <= 6.0);
     assert(std::isfinite(metrics.total_return_pct));
 
-    std::cout << "  [PASS] test_end_to_end_backtester\n";
+    std::cout << "  [PASS] test_end_to_end_backtester (Speed: " << static_cast<uint64_t>(metrics.ticks_per_second) << " ticks/sec)\n";
 }
 
 int main() {
     std::cout << "====================================================\n";
-    std::cout << "🚀 Running AlphaEngine NASA Power of 10 Test Suite\n";
+    std::cout << "🚀 Running AlphaEngine Test Suite\n";
     std::cout << "====================================================\n";
 
     test_ring_buffer_push_and_vwap();
@@ -58,7 +53,7 @@ int main() {
     test_end_to_end_backtester();
 
     std::cout << "====================================================\n";
-    std::cout << "✅ All AlphaEngine Unit & Invariant Tests PASSED!\n";
+    std::cout << "✅ All Unit Tests Passed!\n";
     std::cout << "====================================================\n";
     return 0;
 }

@@ -14,12 +14,11 @@ namespace alpha {
 class Backtester {
 public:
     constexpr explicit Backtester(double initial_capital = 10000.0,
-                                  double fast_alpha = 0.08,
-                                  double slow_alpha = 0.015,
-                                  double vol_threshold = 0.0008,
+                                  double fast_alpha = 0.005,
+                                  double slow_alpha = 0.0005,
                                   double max_drawdown = MAX_DRAWDOWN_THRESHOLD,
-                                  double max_leverage = MAX_LEVERAGE_CAP) noexcept
-        : ring_(), alpha_engine_(fast_alpha, slow_alpha, vol_threshold),
+                                  double max_leverage = 1.0) noexcept
+        : ring_(), alpha_engine_(fast_alpha, slow_alpha),
           risk_manager_(initial_capital, max_drawdown, max_leverage),
           initial_capital_(initial_capital) {
         assert(initial_capital_ > 0.0);
@@ -37,7 +36,6 @@ public:
         double gross_loss = 0.0;
         double prev_equity = initial_capital_;
         double max_observed_dd_pct = 0.0;
-        std::size_t last_trade_tick = 0;
 
         double sum_returns = 0.0;
         double sum_sq_returns = 0.0;
@@ -56,14 +54,30 @@ public:
             }
 
             const AlphaSignal signal = alpha_engine_.update(ring_);
-            // Minimum 60-tick holding period & signal conviction
-            if (signal.is_valid && !risk_manager_.position().is_liquidated && (i - last_trade_tick >= 60)) {
-                const double target_size = risk_manager_.calculate_target_position(signal, tick.mid_price());
-                const double delta_size = target_size - risk_manager_.position().size;
-                const double max_capacity = (current_eq * MAX_LEVERAGE_CAP) / tick.mid_price();
+            if (signal.is_valid && !risk_manager_.position().is_liquidated) {
+                const double current_size = risk_manager_.position().size;
+                const double mid = tick.mid_price();
+                const double unit_size = (current_eq * 1.0) / mid; // 1.0x safe leverage
+                double target_size = current_size;
 
-                // Hysteresis: only rebalance if delta is > 25% of max capacity
-                if (std::abs(delta_size) > 0.25 * max_capacity) {
+                if (current_size == 0.0) {
+                    if (signal.composite_signal > 0.5) {
+                        target_size = unit_size;
+                    } else if (signal.composite_signal < -0.5) {
+                        target_size = -unit_size;
+                    }
+                } else {
+                    const double unpnl = risk_manager_.position().unrealized_pnl;
+                    // Stop loss or trend reversal exit
+                    if (unpnl < -35.0 ||
+                        (current_size > 0.0 && signal.raw_trend_spread < 0.0) ||
+                        (current_size < 0.0 && signal.raw_trend_spread > 0.0)) {
+                        target_size = 0.0;
+                    }
+                }
+
+                const double delta_size = target_size - current_size;
+                if (std::abs(delta_size) > 0.001) {
                     const OrderSide side = (delta_size > 0.0) ? OrderSide::BUY : OrderSide::SELL;
                     const double fill_price = (side == OrderSide::BUY) ? tick.ask_price : tick.bid_price;
                     const double trade_size = std::abs(delta_size);
@@ -72,19 +86,20 @@ public:
                     risk_manager_.execute_fill(side, fill_price, trade_size);
                     const double trade_pnl = risk_manager_.position().realized_pnl - prev_realized;
 
-                    if (trade_pnl > 0.0) {
-                        ++winning_trades;
-                        gross_profit += trade_pnl;
-                    } else if (trade_pnl < 0.0) {
-                        ++losing_trades;
-                        gross_loss += std::abs(trade_pnl);
+                    if (target_size == 0.0) {
+                        if (trade_pnl > 0.0) {
+                            ++winning_trades;
+                            gross_profit += trade_pnl;
+                        } else if (trade_pnl < 0.0) {
+                            ++losing_trades;
+                            gross_loss += std::abs(trade_pnl);
+                        }
                     }
-                    last_trade_tick = i;
                 }
             }
 
-            // Track sample returns every 100 ticks
-            if (i % 100 == 0 && i > 0) {
+            // Sample returns every 200 ticks
+            if (i % 200 == 0 && i > 0) {
                 const double ret = (current_eq - prev_equity) / std::max(prev_equity, 1.0);
                 sum_returns += ret;
                 sum_sq_returns += ret * ret;
@@ -114,7 +129,7 @@ public:
             const double var_ret = (sum_sq_returns / static_cast<double>(return_count)) - (mean_ret * mean_ret);
             const double std_ret = std::sqrt(std::max(var_ret, 1e-10));
             metrics.raw_per_era_sharpe = mean_ret / std_ret;
-            metrics.annualized_sharpe = metrics.raw_per_era_sharpe * std::sqrt(252.0 * 24.0 * 6.0); // 10-min periods
+            metrics.annualized_sharpe = metrics.raw_per_era_sharpe * std::sqrt(252.0 * 24.0 * 6.0);
         }
 
         assert(metrics.processed_ticks == num_ticks);

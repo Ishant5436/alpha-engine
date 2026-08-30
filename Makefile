@@ -10,12 +10,13 @@ bin/alpha_engine: src/main.cpp
 
 test: bin/test_runner
 	@./bin/test_runner
+	@python3 scripts/audit_nasa_power_of_10.py
 
 bin/test_runner: tests/test_runner.cpp
 	@mkdir -p bin
 	$(CXX) $(TEST_FLAGS) $< -o $@
 
 clean:
-	rm -rf bin/ *.dSYM
+	rm -rf bin/ *.dSYM metrics.json
 
 .PHONY: all test clean

@@ -29,7 +29,7 @@ public:
             return 0.0;
         }
 
-        // Bounded position sizing: base on equity * leverage * signal conviction
+        // Bounded position sizing
         const double max_allowed_notional = position_.current_equity * max_leverage_;
         const double raw_target_notional = max_allowed_notional * signal.composite_signal;
         const double target_units = raw_target_notional / current_price;
@@ -41,6 +41,10 @@ public:
     bool update_pnl(double current_price) noexcept {
         assert(current_price > 0.0);
         assert(position_.peak_equity > 0.0);
+
+        if (position_.is_liquidated) {
+            return false;
+        }
 
         if (position_.size != 0.0) {
             position_.unrealized_pnl = position_.size * (current_price - position_.entry_price);
@@ -55,7 +59,7 @@ public:
 
         // Hard Circuit Breaker / Drawdown Kill-Switch
         const double current_drawdown = (position_.peak_equity - position_.current_equity) / position_.peak_equity;
-        if (current_drawdown >= max_drawdown_ && !position_.is_liquidated) {
+        if (current_drawdown >= max_drawdown_) {
             position_.is_liquidated = true;
             position_.realized_pnl += position_.unrealized_pnl;
             position_.unrealized_pnl = 0.0;
@@ -64,7 +68,7 @@ public:
         }
 
         assert(position_.current_equity >= 0.0);
-        return !position_.is_liquidated;
+        return true;
     }
 
     void execute_fill(OrderSide side, double fill_price, double fill_size) noexcept {
@@ -75,21 +79,28 @@ public:
         }
 
         const double signed_size = (side == OrderSide::BUY) ? fill_size : -fill_size;
-        const double new_size = position_.size + signed_size;
+        const double old_size = position_.size;
+        const double new_size = old_size + signed_size;
 
-        if (position_.size == 0.0) {
+        if (old_size == 0.0) {
             position_.entry_price = fill_price;
-        } else if ((position_.size > 0.0 && signed_size > 0.0) || (position_.size < 0.0 && signed_size < 0.0)) {
-            // Increase existing position (weighted avg entry)
-            position_.entry_price = (position_.entry_price * std::abs(position_.size) + fill_price * fill_size) / std::abs(new_size);
+            position_.size = new_size;
+        } else if ((old_size > 0.0 && signed_size > 0.0) || (old_size < 0.0 && signed_size < 0.0)) {
+            // Increasing position in same direction
+            position_.entry_price = (position_.entry_price * std::abs(old_size) + fill_price * fill_size) / std::abs(new_size);
+            position_.size = new_size;
         } else {
-            // Closing or reducing position
-            const double closed_size = std::min(std::abs(position_.size), fill_size);
-            const double pnl_per_unit = (position_.size > 0.0) ? (fill_price - position_.entry_price) : (position_.entry_price - fill_price);
+            // Reducing or flipping position
+            const double closed_size = std::min(std::abs(old_size), fill_size);
+            const double pnl_per_unit = (old_size > 0.0) ? (fill_price - position_.entry_price) : (position_.entry_price - fill_price);
             position_.realized_pnl += closed_size * pnl_per_unit;
-        }
 
-        position_.size = new_size;
+            if (std::abs(signed_size) > std::abs(old_size)) {
+                // Position flipped direction
+                position_.entry_price = fill_price;
+            }
+            position_.size = new_size;
+        }
         assert(std::isfinite(position_.realized_pnl));
     }
 
