@@ -3,7 +3,7 @@
 #include "risk_manager.hpp"
 
 void test_risk_manager_drawdown_killswitch() {
-    alpha::RiskManager rm(10000.0, 0.04, 3.0); // 4% drawdown limit ($400 loss)
+    alpha::RiskManager rm(10000.0, 0.04, 3.0, 0.0); // 0 fee for isolated circuit-breaker unit test
     assert(rm.position().current_equity == 10000.0);
     assert(!rm.position().is_liquidated);
 
