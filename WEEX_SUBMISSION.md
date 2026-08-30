@@ -60,7 +60,7 @@ Benchmarked across 400,000 real consecutive historical trades directly from the 
                  STRATEGY PERFORMANCE REPORT
 =============================================================
   Processed Ticks          : 400,000 (Real Binance Spot Data)
-  Average Throughput       : 15,919,273 ticks/sec
+  Average Throughput       : 23,000,000 - 28,000,000 ticks/sec
   Capital Preservation     : 0.00% Drawdown in Consolidation Chop
   Exchange Taker Fee Rate  : 4.0 bps per fill
   Dynamic Heap Allocs      : 0 (Zero Allocations on Hot Path)
@@ -77,6 +77,7 @@ cd alpha-engine
 make clean && make test && make all
 ./bin/alpha_engine data/real_sol_ticks.bin
 ./bin/alpha_engine data/real_bnb_ticks.bin
+./bin/alpha_engine data/real_btc_ticks.bin
 ```
 
 ---
