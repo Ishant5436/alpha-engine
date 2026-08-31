@@ -5,6 +5,8 @@
 **Core Language:** C++20 (Zero-Heap Hot Path, Optimized for Apple Silicon ARM64)  
 **Safety Standard:** Deterministic Safety-Critical Systems Invariants  
 
+![AlphaEngine Terminal Demo](assets/alpha_engine_demo.gif)
+
 ---
 
 ## 1. System Architecture
