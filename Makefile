@@ -40,7 +40,10 @@ asan: tests/test_whitebox.cpp tests/test_runner.cpp
 	@./bin/test_runner_asan
 	@echo "=== AddressSanitizer & UBSan: 100% MEMORY SAFE & ZERO LEAKS ==="
 
+demo: all
+	@python3 scripts/record_demo_walkthrough.py
+
 clean:
 	rm -rf bin/ *.dSYM metrics.json .pytest_cache
 
-.PHONY: all live test asan clean
+.PHONY: all live test asan demo clean

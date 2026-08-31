@@ -1,9 +1,13 @@
 # AlphaEngine: High-Performance C++20 Algorithmic Trading Core
 
-**Target Competition:** WEEX AI Wars II: Rise of Intelligence ($200,000 Prize Pool)  
-**Author:** Ishant Panchal (`Ishant5436`)  
-**Core Language:** C++20 (Zero-Heap Hot Path, Optimized for Apple Silicon ARM64)  
-**Safety Standard:** Deterministic Safety-Critical Systems Invariants  
+[![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-16%2F16%20Passed-brightgreen)](tests/)
+[![Throughput](https://img.shields.io/badge/Throughput-30.5M%20ticks%2Fsec-blue)](data/)
+[![AddressSanitizer](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20Leaks-purple)](Makefile)
+[![Safety Standard](https://img.shields.io/badge/Safety%20Standard-Deterministic%20Invariants-orange)](scripts/audit_safety_invariants.py)
+
+> **Target Competition:** WEEX AI Wars II: Rise of Intelligence ($200,000 Prize Pool)  
+> **1-Second Instant Demo:** `make demo`
 
 ![AlphaEngine Terminal Demo](assets/alpha_engine_demo.gif)
 
