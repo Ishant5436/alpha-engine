@@ -8,7 +8,7 @@ import subprocess
 import json
 import time
 
-HACKATHON_URL = "https://dorahacks.io/hackathon/weex-ai-wars-2"
+HACKATHON_URL = "https://dorahacks.io/hackathon/weex-ai-wars2"
 
 SUBMISSION_PAYLOAD = {
     "title": "AlphaEngine: Zero-Heap C++20 High-Frequency Execution Core",
