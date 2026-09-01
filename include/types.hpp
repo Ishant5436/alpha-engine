@@ -36,6 +36,7 @@ struct Tick {
         return ask_price - bid_price;
     }
 };
+static_assert(sizeof(Tick) == 56, "Tick must be exactly 56 bytes for binary disk serialization");
 
 struct Position {
     double size{0.0};          // positive = long, negative = short

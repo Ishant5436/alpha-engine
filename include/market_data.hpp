@@ -69,7 +69,7 @@ public:
     }
 
 private:
-    std::array<Tick, N> buffer_{};
+    alignas(64) std::array<Tick, N> buffer_{};
     std::size_t head_{0};
     std::size_t count_{0};
     double cumulative_volume_{0.0};
