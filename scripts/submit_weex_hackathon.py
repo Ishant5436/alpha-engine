@@ -48,14 +48,14 @@ def copy_to_clipboard(text: str):
     process.communicate(text.encode("utf-8"))
 
 def main():
-    print("🚀 Staging WEEX AI Wars II ($200,000 USDT) Submission Package...")
+    print("[EXECUTE]  Staging WEEX AI Wars II ($200,000 USDT) Submission Package...")
     print(f"• Title: {SUBMISSION_PAYLOAD['title']}")
     print(f"• Category: {SUBMISSION_PAYLOAD['category']}")
     print(f"• Repo: {SUBMISSION_PAYLOAD['github_repo']}")
     
     # Copy description to clipboard
     copy_to_clipboard(DESCRIPTION_MARKDOWN)
-    print("📋 Markdown description copied to macOS clipboard!")
+    print("[STAGED]  Markdown description copied to macOS clipboard!")
 
     print(f"\nLaunching Brave Browser to: {HACKATHON_URL}")
     subprocess.run(["open", "-a", "Brave Browser", HACKATHON_URL])

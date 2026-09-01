@@ -59,7 +59,7 @@ def fetch_real_trades(symbol="SOLUSDT", target_ticks=100000, output_path="data/r
         for t in all_ticks:
             f.write(struct.pack("Qdddddd", t[0], t[1], t[2], t[3], t[4], t[5], t[6]))
 
-    print(f"✅ Successfully wrote {len(all_ticks):,} real Binance market ticks for {symbol} to '{output_path}'")
+    print(f"[SUCCESS]  Successfully wrote {len(all_ticks):,} real Binance market ticks for {symbol} to '{output_path}'")
 
 if __name__ == "__main__":
     symbol = sys.argv[1] if len(sys.argv) > 1 else "SOLUSDT"

@@ -46,7 +46,7 @@ def check_portal():
         return {"error": str(e)}
 
 def main():
-    log("🚀 WEEX AI Wars II Portal Watcher Daemon initialized.")
+    log("[EXECUTE]  WEEX AI Wars II Portal Watcher Daemon initialized.")
     log(f"Monitoring: {HACKATHON_URL}")
     
     # Run an initial check
@@ -54,10 +54,10 @@ def main():
     log(f"Initial Portal Status: {json.dumps(status)}")
     
     if status.get("hasSubmit"):
-        log("🎉 Submission Portal is UNLOCKED! Triggering submission runner...")
+        log("[COMPLETE]  Submission Portal is UNLOCKED! Triggering submission runner...")
         subprocess.run(["python3", "/Users/ishantpanchal/alpha-engine/scripts/submit_weex_hackathon.py"])
     else:
-        log("⏳ Portal in Pre-Registration mode. Staged for September 2 unlock.")
+        log("[PENDING]  Portal in Pre-Registration mode. Staged for September 2 unlock.")
 
 if __name__ == "__main__":
     main()

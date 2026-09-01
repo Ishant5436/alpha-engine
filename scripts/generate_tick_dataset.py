@@ -64,7 +64,7 @@ def generate_ticks(filename: str, num_ticks: int = 500000):
             vol = np.random.uniform(0.5, 3.0)
             f.write(struct.pack("Qdddddd", ts, bid, ask, 10.0, 10.0, p, vol))
 
-    print(f"✅ Generated {num_ticks:,} ticks in binary format.")
+    print(f"[SUCCESS]  Generated {num_ticks:,} ticks in binary format.")
 
 if __name__ == "__main__":
     out_file = sys.argv[1] if len(sys.argv) > 1 else "/Users/ishantpanchal/alpha-engine/data/ticks_500k.bin"

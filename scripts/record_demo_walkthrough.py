@@ -33,7 +33,7 @@ def main():
     if code != 0:
         print("Compilation failed:\n", err)
         sys.exit(1)
-    print("✔ Compilation successful: bin/alpha_engine ready.")
+    print("[SUCCESS]  Compilation successful: bin/alpha_engine ready.")
 
     assets = [
         ("SOLUSDT", "data/real_sol_ticks.bin"),
