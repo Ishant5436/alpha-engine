@@ -6,6 +6,8 @@
 #include "market_data.hpp"
 #include "alpha_engine.hpp"
 #include "risk_manager.hpp"
+#include "monotonic_queue.hpp"
+#include "welford_accumulator.hpp"
 
 using namespace alpha;
 
@@ -120,6 +122,53 @@ void test_whitebox_risk_manager_peak_equity_monotonicity() {
     assert(rm.position().peak_equity == 10500.0);
 }
 
+void test_whitebox_monotonic_queue_sliding_maximum() {
+    MonotonicQueue<double, 8, std::greater<double>> mq;
+    assert(mq.empty());
+
+    // Window size = 3 ticks. Feed values: [10, 5, 12, 8, 15]
+    mq.push(10.0, 0); // Window: [10] -> max = 10
+    assert(mq.top() == 10.0);
+
+    mq.push(5.0, 1);  // Window: [10, 5] -> max = 10
+    assert(mq.top() == 10.0);
+
+    mq.push(12.0, 2); // Window: [10, 5, 12] -> max = 12 (10 and 5 evicted from queue)
+    assert(mq.top() == 12.0);
+
+    // Slide window: min_valid_index = 1 (removes index 0)
+    mq.pop_expired(1);
+    assert(mq.top() == 12.0);
+
+    mq.push(8.0, 3);  // Window: [5, 12, 8] -> max = 12
+    mq.pop_expired(2); // Slide window: min_valid_index = 2 -> window: [12, 8]
+    assert(mq.top() == 12.0);
+
+    mq.pop_expired(3); // Slide window: min_valid_index = 3 -> removes index 2 (12)
+    assert(mq.top() == 8.0); // Now 8.0 is max
+
+    mq.push(15.0, 4); // Window: [8, 15] -> max = 15
+    assert(mq.top() == 15.0);
+}
+
+void test_whitebox_welford_statistical_accumulator() {
+    WelfordAccumulator acc;
+    assert(acc.count() == 0);
+    assert(acc.variance() == 0.0);
+
+    // Sample: [2, 4, 4, 4, 5, 5, 7, 9]
+    // Mean = 5.0, Sample Variance = 4.571428... (32 / 7)
+    const std::vector<double> samples = {2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0};
+    for (double x : samples) {
+        acc.update(x);
+    }
+
+    assert(acc.count() == 8);
+    assert(std::abs(acc.mean() - 5.0) < 1e-9);
+    assert(std::abs(acc.variance() - (32.0 / 7.0)) < 1e-9);
+    assert(std::abs(acc.stdev() - std::sqrt(32.0 / 7.0)) < 1e-9);
+}
+
 int main() {
     std::cout << "====================================================\n";
     std::cout << "Running AlphaEngine White-Box Invariant Test Suite\n";
@@ -142,6 +191,12 @@ int main() {
 
     test_whitebox_risk_manager_peak_equity_monotonicity();
     std::cout << "  [PASS] test_whitebox_risk_manager_peak_equity_monotonicity\n";
+
+    test_whitebox_monotonic_queue_sliding_maximum();
+    std::cout << "  [PASS] test_whitebox_monotonic_queue_sliding_maximum\n";
+
+    test_whitebox_welford_statistical_accumulator();
+    std::cout << "  [PASS] test_whitebox_welford_statistical_accumulator\n";
 
     std::cout << "====================================================\n";
     std::cout << "All White-Box Tests Passed Successfully!\n";
