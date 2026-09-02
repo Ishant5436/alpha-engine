@@ -11,8 +11,9 @@ import subprocess
 import tempfile
 import json
 import pytest
+from pathlib import Path
 
-ALPHA_ENGINE_ROOT = "/Users/ishantpanchal/alpha-engine"
+ALPHA_ENGINE_ROOT = str(Path(__file__).resolve().parent.parent)
 BIN_ENGINE = os.path.join(ALPHA_ENGINE_ROOT, "bin/alpha_engine")
 BIN_LIVE = os.path.join(ALPHA_ENGINE_ROOT, "bin/live_trader")
 

@@ -64,5 +64,5 @@ def fetch_real_trades(symbol="SOLUSDT", target_ticks=100000, output_path="data/r
 if __name__ == "__main__":
     symbol = sys.argv[1] if len(sys.argv) > 1 else "SOLUSDT"
     ticks = int(sys.argv[2]) if len(sys.argv) > 2 else 100000
-    out = sys.argv[3] if len(sys.argv) > 3 else f"/Users/ishantpanchal/alpha-engine/data/real_{symbol.lower()}_ticks.bin"
+    out = sys.argv[3] if len(sys.argv) > 3 else fos.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", f"real_{symbol.lower()}_ticks.bin")
     fetch_real_trades(symbol=symbol, target_ticks=ticks, output_path=out)

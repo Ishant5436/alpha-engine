@@ -2,7 +2,7 @@ import struct
 import numpy as np
 
 ticks = []
-with open('/Users/ishantpanchal/alpha-engine/data/real_btc_ticks.bin', 'rb') as f:
+with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'real_btc_ticks.bin'), 'rb') as f:
     while True:
         data = f.read(56)
         if not data: break

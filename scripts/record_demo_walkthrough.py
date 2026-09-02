@@ -28,8 +28,10 @@ def main():
 
     time.sleep(1)
 
+    PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     print("[1/3] Compiling optimized C++20 release binary...")
-    out, err, code = run_cmd("cd /Users/ishantpanchal/alpha-engine && make all")
+    out, err, code = run_cmd(f"cd {PROJECT_ROOT} && make all")
     if code != 0:
         print("Compilation failed:\n", err)
         sys.exit(1)
@@ -44,13 +46,13 @@ def main():
     print("\n[2/3] Executing high-frequency tick ingestion across Binance datasets...")
     for sym, path in assets:
         print(f"\n--- Testing Asset: {sym} ({path}) ---")
-        out, err, code = run_cmd(f"/Users/ishantpanchal/alpha-engine/bin/alpha_engine /Users/ishantpanchal/alpha-engine/{path}")
+        out, err, code = run_cmd(f"{PROJECT_ROOT}/bin/alpha_engine {PROJECT_ROOT}/{path}")
         lines = [l.strip() for l in out.splitlines() if l.strip()]
         for line in lines[-8:]:
             print(f"  {line}")
 
     print("\n[3/3] Running Static Safety Invariant Ast Analyzer...")
-    out, err, code = run_cmd("python3 /Users/ishantpanchal/alpha-engine/scripts/audit_safety_invariants.py")
+    out, err, code = run_cmd(f"python3 {PROJECT_ROOT}/scripts/audit_safety_invariants.py")
     for line in out.splitlines()[-4:]:
         print(f"  {line}")
 

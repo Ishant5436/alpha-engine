@@ -88,7 +88,9 @@ def audit_file(filepath: str) -> list[dict]:
     return issues
 
 def main():
-    target_dirs = ["/Users/ishantpanchal/alpha-engine/include", "/Users/ishantpanchal/alpha-engine/src"]
+    from pathlib import Path
+    project_root = str(Path(__file__).resolve().parent.parent)
+    target_dirs = [os.path.join(project_root, "include"), os.path.join(project_root, "src")]
     all_issues = []
     analyzed_files = 0
 
