@@ -5,6 +5,7 @@ Runs end-to-end backtest on real Binance Spot historical feeds (SOL, BNB, BTC)
 and prints a clean, institutional telemetry summary.
 """
 
+import os
 import subprocess
 import time
 import sys

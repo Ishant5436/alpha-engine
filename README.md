@@ -1,7 +1,7 @@
 # AlphaEngine: High-Performance C++20 Algorithmic Trading Core
 
 [![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-23%2F23%20Passed-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-18%2F18%20Passed-brightgreen)](tests/)
 [![Throughput](https://img.shields.io/badge/Throughput-30.5M%20ticks%2Fsec-blue)](data/)
 [![AddressSanitizer](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20Leaks-purple)](Makefile)
 [![Safety Standard](https://img.shields.io/badge/Safety%20Standard-Deterministic%20Invariants-orange)](scripts/audit_safety_invariants.py)
