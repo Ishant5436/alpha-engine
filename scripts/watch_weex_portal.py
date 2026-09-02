@@ -24,11 +24,13 @@ def log(msg: str):
 def check_portal():
     js = """
     (function() {
+        const text = document.body.innerText;
+        const isUpcoming = text.includes("Submission starts in");
         const buttons = Array.from(document.querySelectorAll("button, a"))
             .map(b => b.innerText.trim());
-        const hasSubmit = buttons.some(t => t.toLowerCase().includes("submit buidl") || t.toLowerCase().includes("apply"));
-        const isPreReg = buttons.some(t => t.toLowerCase().includes("pre-registration") || t.toLowerCase().includes("registered"));
-        return JSON.stringify({ hasSubmit, isPreReg, buttonCount: buttons.length, title: document.title });
+        const hasSubmitBtn = buttons.some(t => t.toLowerCase().includes("submit buidl") || t.toLowerCase().includes("apply"));
+        const isLive = hasSubmitBtn && !isUpcoming;
+        return JSON.stringify({ isLive, isUpcoming, hasSubmitBtn, title: document.title });
     })()
     """
     cmd = f'''
@@ -45,19 +47,36 @@ def check_portal():
     except Exception as e:
         return {"error": str(e)}
 
+import sys
+
 def main():
-    log("[EXECUTE]  WEEX AI Wars II Portal Watcher Daemon initialized.")
-    log(f"Monitoring: {HACKATHON_URL}")
-    
-    # Run an initial check
-    status = check_portal()
-    log(f"Initial Portal Status: {json.dumps(status)}")
-    
-    if status.get("hasSubmit"):
-        log("[COMPLETE]  Submission Portal is UNLOCKED! Triggering submission runner...")
-        subprocess.run(["python3", "/Users/ishantpanchal/alpha-engine/scripts/submit_weex_hackathon.py"])
-    else:
-        log("[PENDING]  Portal in Pre-Registration mode. Staged for September 2 unlock.")
+    loop_mode = "--loop" in sys.argv or "-l" in sys.argv
+    log("[EXECUTE] WEEX AI Wars II Portal Watcher Daemon initialized.")
+    log(f"Monitoring: {HACKATHON_URL} (Loop mode: {loop_mode})")
+
+    while True:
+        status = check_portal()
+        log(f"Portal Status Check: {json.dumps(status)}")
+
+        if status.get("isLive"):
+            log("[COMPLETE] Submission Portal is LIVE and UNLOCKED! Triggering submission runner...")
+            cmd = ["python3", os.path.expanduser("~/alpha-engine/scripts/submit_weex_hackathon.py")]
+            subprocess.run(cmd)
+            if loop_mode:
+                log("[COMPLETE] Submission dispatched. Exiting daemon.")
+                break
+        else:
+            log("[PENDING] Portal in Pre-Registration mode. Staged for September 2 unlock.")
+
+        if not loop_mode:
+            break
+
+        # Adaptive sleep: sleep 300s (5m) overnight, then 30s as we approach 11:00 AM IST
+        now = datetime.datetime.now()
+        if now.day == 2 and now.hour >= 10:
+            time.sleep(30)
+        else:
+            time.sleep(300)
 
 if __name__ == "__main__":
     main()
