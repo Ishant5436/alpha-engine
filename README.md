@@ -1,7 +1,7 @@
 # AlphaEngine: High-Performance C++20 Algorithmic Trading Core
 
 [![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-16%2F16%20Passed-brightgreen)](tests/)
+[![Tests](https://img.shields.io/badge/Unit%20Tests-23%2F23%20Passed-brightgreen)](tests/)
 [![Throughput](https://img.shields.io/badge/Throughput-30.5M%20ticks%2Fsec-blue)](data/)
 [![AddressSanitizer](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20Leaks-purple)](Makefile)
 [![Safety Standard](https://img.shields.io/badge/Safety%20Standard-Deterministic%20Invariants-orange)](scripts/audit_safety_invariants.py)
@@ -13,22 +13,19 @@
 
 ---
 
-## 1. System Architecture
+## 1. System Architecture & Algorithmic Primitives
 
 `AlphaEngine` is an ultra-low-latency, zero-heap quantitative execution and risk engine built for high-frequency cryptocurrency trading under extreme volatility.
 
-```mermaid
-graph TD
-    A[L2/Tick Stream Ingestion] --> B[Fixed-Capacity Ring Buffer (Zero Heap)]
-    B --> C[Multi-Frequency Alpha Engine (Fast/Slow EMA Spread)]
-    C -->|Momentum Breakout| D[Target Position Engine]
-    C -->|Mean Reversion Range| E[VWAP Signal Filter]
-    D --> F[Deterministic Risk Guard]
-    E --> F
-    F -->|Drawdown >= 4.0%| G[Deterministic Circuit Breaker / Liquidation]
-    F -->|Approved Orders| H[Sub-Microsecond Execution Fill]
-    H --> I[Sharpe & Telemetry Monitor]
-```
+### Data Structures & Algorithmic Complexity
+
+| Component | Primitive | Time Complexity | Space Complexity | Hardware & Cache Invariant |
+| :--- | :--- | :---: | :---: | :--- |
+| **Market Data Ingestion** | `MarketDataRingBuffer` | $\mathcal{O}(1)$ push / query | $\mathcal{O}(C)$ static | `alignas(64)` L1 cache-line aligned; power-of-2 bitmask wrap (`tail & (Cap - 1)`). |
+| **Sliding Window Extrema** | `MonotonicQueue` | $\mathcal{O}(1)$ amortized | $\mathcal{O}(K)$ static | Circular monotonic deque tracking rolling high/low price boundaries without heap alloc. |
+| **Online Running Variance**| `WelfordAccumulator` | $\mathcal{O}(1)$ update | $\mathcal{O}(1)$ registers | Numerically stable single-pass variance: $M_{2,n} = M_{2,n-1} + (x_n - \bar{x}_{n-1})(x_n - \bar{x}_n)$. |
+| **Multi-Freq Alpha Signals** | Exponential Moving Avgs | $\mathcal{O}(1)$ step | $\mathcal{O}(1)$ scalar | Direct floating-point multiply-accumulate (FMA) register updates. |
+| **Circuit Breaker** | `DeterministicRiskManager` | $\mathcal{O}(1)$ step | $\mathcal{O}(1)$ scalar | Peak equity monotonic tracking with hard 4.0% drawdown liquidation lock. |
 
 ---
 
