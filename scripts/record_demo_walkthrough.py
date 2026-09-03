@@ -23,7 +23,7 @@ def run_cmd(cmd):
 def main():
     print_header("ALPHA ENGINE: C++20 ZERO-HEAP EXECUTION DEMO")
     print("• Target Architecture: Apple Silicon ARM64 (M5 Pro)")
-    print("• Constraints: Gerard J. Holzmann Power of 10 Safety Invariants")
+    print("• Constraints: Deterministic Safety Invariants (Power of 10 Rules)")
     print("• Hot Path Memory: 0 Dynamic Heap Allocations (O(1) Ring Buffer)")
     print("• Friction: 4.0 bps Exchange Taker Fee + Half-Spread Slippage\n")
 

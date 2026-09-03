@@ -32,7 +32,7 @@ Most retail algorithmic trading bots and open-source backtesters fail in live cr
 * **Zero-Heap Circular Buffer:** Fixed-capacity `MarketDataRingBuffer<2048>` providing strictly $O(1)$ push/pop and real-time VWAP calculations with 0 dynamic heap allocations after initialization.
 * **Volatility-Gated Multi-Horizon Signal:** Combines multi-frequency exponential moving averages (Fast 50-tick, Medium 250-tick, Slow 1,250-tick) with real-time Parkinson realized volatility estimation. In choppy regimes, the engine strictly halts trading (`State: FLAT`), eliminating 95%+ of fee drag.
 * **Institutional Friction Modeling:** Explicitly models real-world exchange execution costs (4.0 bps taker fees per fill + half-spread slippage).
-* **Deterministic Safety Invariants:** Adheres strictly to Holzmann's Power of 10 Safety Rules (functions $\le 60$ lines, assertion density $\ge 2$, bounded loops, zero preprocessor macros).
+* **Deterministic Safety Invariants:** Adheres strictly to Deterministic Safety Invariants (Power of 10 Rules: functions $\le 60$ lines, assertion density $\ge 2$, bounded loops, zero preprocessor macros).
 
 ```
 Binance Market Tick Stream (BTC / ETH / SOL / BNB)

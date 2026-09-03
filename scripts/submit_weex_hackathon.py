@@ -25,7 +25,7 @@ AlphaEngine is an ultra-low-latency, zero-allocation C++20 quantitative trading 
 1. Zero-Heap Ring Buffer: Fixed-capacity MarketDataRingBuffer<2048> providing O(1) push/pop and real-time VWAP with zero heap allocations on the hot execution path.
 2. Volatility-Gated Signal: Combines triple-EMA alignment with real-time Parkinson realized volatility estimation. In choppy consolidation regimes (<1.5 bps), trading is halted (State: FLAT), eliminating 95%+ of taker fee drag.
 3. Institutional Friction Modeling: Explicitly accounts for 4.0 bps taker fees per fill and half-spread slippage.
-4. Deterministic Safety Invariants: Complies strictly with Gerard J. Holzmann's Power of 10 Safety Rules (functions <= 60 lines, assertion density >= 2, bounded loops).
+4. Deterministic Safety Invariants: Complies strictly with Deterministic Safety Invariants (Power of 10 Rules: functions <= 60 lines, assertion density >= 2, bounded loops).
 
 ### Benchmark & Verification Evidence
 Benchmarked across 400,000 real consecutive historical trades directly from Binance Spot API:
