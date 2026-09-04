@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "types.hpp"
 #include "market_data.hpp"
+#include "welford_accumulator.hpp"
 
 namespace alpha {
 
@@ -86,20 +87,23 @@ public:
 private:
     double calculate_realized_volatility(const MarketDataRingBuffer<MAX_RING_CAPACITY>& ring, std::size_t window) const noexcept {
         assert(window > 0);
-        assert(ring.size() >= window);
+        if (ring.size() < 2 || window < 2) {
+            return 0.0;
+        }
         const std::size_t limit = std::min(window, ring.size());
-        double sum_ret_sq = 0.0;
+        assert(limit >= 2);
+        WelfordAccumulator acc;
 
         for (std::size_t i = 0; i < limit - 1; ++i) {
             const double p1 = ring[i].last_price;
             const double p0 = ring[i + 1].last_price;
-            if (p0 > 0.0) {
+            if (p0 > 0.0 && p1 > 0.0) {
                 const double ret = (p1 - p0) / p0;
-                sum_ret_sq += ret * ret;
+                acc.update(ret);
             }
         }
 
-        const double vol = std::sqrt(sum_ret_sq / static_cast<double>(limit));
+        const double vol = acc.stdev();
         assert(vol >= 0.0);
         return vol;
     }
