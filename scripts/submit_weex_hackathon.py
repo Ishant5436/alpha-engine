@@ -33,7 +33,7 @@ Benchmarked across 400,000 real consecutive historical trades directly from Bina
 - Consolidation Drawdown: 0.00% (Capital Preserved)
 - Exchange Taker Fee Rate: 4.0 bps per fill
 - Dynamic Heap Allocations: 0 (Zero Allocations on Hot Path)
-- Test Suite: 16/16 Passed under Clang AddressSanitizer & UBSan
+- Test Suite: 13/13 C++ tests verified clean under Clang AddressSanitizer & UBSan (18/18 total tests passing)
 
 ### Verification Commands
 git clone https://github.com/Ishant5436/alpha-engine.git
