@@ -168,5 +168,22 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    const auto& pos = risk_mgr.position();
+    std::cout << "\n================================================================================\n";
+    std::cout << "        ALPHAENGINE LIVE FORWARD PAPER TRADING SESSION SUMMARY\n";
+    std::cout << "================================================================================\n";
+    std::cout << "  Symbol           : " << symbol << "\n";
+    std::cout << "  Total Ticks      : " << tick_count << "\n";
+    if (ring.size() > 0) {
+        std::cout << "  Final Price      : $" << std::fixed << std::setprecision(2) << ring.latest().last_price << "\n";
+        std::cout << "  Final VWAP       : $" << std::setprecision(2) << ring.vwap() << "\n";
+    }
+    std::cout << "  Initial Capital  : $" << std::setprecision(2) << initial_capital << "\n";
+    std::cout << "  Final Equity     : $" << std::setprecision(2) << pos.current_equity << "\n";
+    std::cout << "  Realized PnL     : $" << std::setprecision(2) << pos.realized_pnl << "\n";
+    std::cout << "  Taker Fees Paid  : $" << std::setprecision(2) << risk_mgr.cumulative_fees() << "\n";
+    std::cout << "  Total Trades     : " << total_trades << "\n";
+    std::cout << "================================================================================\n";
+
     return 0;
 }
