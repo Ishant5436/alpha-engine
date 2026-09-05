@@ -1,6 +1,6 @@
 CXX := clang++
-CXXFLAGS := -std=c++20 -O3 -Wall -Wextra -Werror -pedantic -march=native -Iinclude
-TEST_FLAGS := -std=c++20 -O3 -Wall -Wextra -Werror -pedantic -march=native -Iinclude
+CXXFLAGS := -std=c++20 -O3 -Wall -Wextra -Werror -pedantic -Wno-error=invalid-feature-combination -march=native -Iinclude
+TEST_FLAGS := -std=c++20 -O3 -Wall -Wextra -Werror -pedantic -Wno-error=invalid-feature-combination -march=native -Iinclude
 
 all: bin/alpha_engine bin/live_trader
 
