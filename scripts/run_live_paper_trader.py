@@ -78,27 +78,42 @@ async def run_ws_stream(symbol="BTCUSDT", capital=10000.0, max_ticks=None):
     ws_url = f"wss://stream.binance.com:9443/ws/{symbol.lower()}@trade"
     ticks_sent = 0
 
-    print(f"Opening live WebSocket connection: {ws_url}")
+    reconnect_attempts = 0
+    max_reconnects = 10
+    base_reconnect_delay = 1.0
+
     try:
-        async with websockets.connect(ws_url) as ws:
-            while proc.poll() is None:
-                msg = await ws.recv()
-                data = json.loads(msg)
-                ts = data['T']
-                p = float(data['p'])
-                q = float(data['q'])
-                side = "SELL" if data['m'] else "BUY"
-                proc.stdin.write(f"{ts} {p} {q} {side}\n")
-                proc.stdin.flush()
-                ticks_sent += 1
-                if max_ticks is not None and ticks_sent >= max_ticks:
-                    print(f"\n[STREAM] Completed target stream of {max_ticks} live market ticks.")
+        while proc.poll() is None:
+            if max_ticks is not None and ticks_sent >= max_ticks:
+                break
+            try:
+                print(f"[STREAM] Connecting live WebSocket (Attempt {reconnect_attempts + 1}): {ws_url}")
+                async with websockets.connect(ws_url, ping_interval=20, ping_timeout=20) as ws:
+                    reconnect_attempts = 0  # Reset upon successful connection
+                    while proc.poll() is None:
+                        msg = await ws.recv()
+                        data = json.loads(msg)
+                        ts = data['T']
+                        p = float(data['p'])
+                        q = float(data['q'])
+                        side = "SELL" if data['m'] else "BUY"
+                        proc.stdin.write(f"{ts} {p} {q} {side}\n")
+                        proc.stdin.flush()
+                        ticks_sent += 1
+                        if max_ticks is not None and ticks_sent >= max_ticks:
+                            print(f"\n[STREAM] Completed target stream of {max_ticks} live market ticks.")
+                            return
+            except (asyncio.CancelledError, KeyboardInterrupt):
+                print("\nStopping live paper trader...")
+                break
+            except Exception as e:
+                reconnect_attempts += 1
+                if reconnect_attempts > max_reconnects:
+                    print(f"[WARN] WebSocket reconnect limit ({max_reconnects}) reached. Falling back to REST stream: {e}")
                     break
-    except KeyboardInterrupt:
-        print("\nStopping live paper trader...")
-    except Exception as e:
-        print(f"WebSocket disconnected ({e}), switching to fallback stream...")
-        run_sync_stream(symbol, capital, max_ticks=max_ticks)
+                delay = min(30.0, base_reconnect_delay * (2 ** (reconnect_attempts - 1)))
+                print(f"[WARN] WebSocket disconnected ({e}). Reconnecting in {delay:.1f}s (Attempt {reconnect_attempts}/{max_reconnects})...")
+                await asyncio.sleep(delay)
     finally:
         if proc.stdin and not proc.stdin.closed:
             try:
