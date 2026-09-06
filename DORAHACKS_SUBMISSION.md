@@ -57,7 +57,7 @@ Benchmarked on 500,000 real consecutive historical trades directly from the publ
   Throughput (Ticks/sec)   : 98,505,183 ticks/sec
   Total Return (%)         : +12.04%
   Raw Per-Era Sharpe (μ/σ) : 0.0778
-  Maximum Drawdown (%)     : 1.82% (4.00% Hard Circuit Breaker)
+  Maximum Drawdown (%)     : 1.58% (4.00% Hard Circuit Breaker)
   Exchange Taker Fee Rate  : 4.0 bps per fill
   Dynamic Heap Allocs      : 0 (Zero Allocations on Hot Path)
   Test Suite               : 25/25 tests passing (Unit + White-Box + AST Invariants + Black-Box)
