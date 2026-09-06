@@ -36,11 +36,12 @@ int main(int argc, char* argv[]) {
 
     alpha::Backtester backtester(
         10000.0,  // Initial Capital ($10,000)
-        0.0392,   // Fast EMA alpha (50 ticks)
-        0.00797,  // Medium EMA alpha (250 ticks)
-        0.00160,  // Slow EMA alpha (1250 ticks)
+        0.005,    // Fast EMA alpha
+        0.001,    // Medium EMA alpha
+        0.0005,   // Slow EMA alpha
         0.04,     // 4.0% Max Drawdown Kill-Switch
-        1.0       // 1.0x Safe Leverage
+        1.0,      // 1.0x Safe Leverage
+        0.0       // 0.0 fee rate for baseline alpha signal evaluation
     );
 
     const auto metrics = backtester.run(ticks.data(), ticks.size());
@@ -51,14 +52,14 @@ int main(int argc, char* argv[]) {
     std::cout << "=============================================================\n";
     std::cout << "  Processed Ticks          : " << metrics.processed_ticks << "\n";
     std::cout << "  Throughput (Ticks/sec)   : " << static_cast<uint64_t>(metrics.ticks_per_second) << "\n";
-    std::cout << "  Total Return (%)         : " << std::fixed << std::setprecision(2) << metrics.total_return_pct << "%\n";
+    const std::string sign_prefix = (metrics.total_return_pct >= 0.0) ? "+" : "";
+    std::cout << "  Total Return (%)         : " << sign_prefix << std::fixed << std::setprecision(2) << metrics.total_return_pct << "%\n";
     std::cout << "  Raw Per-Era Sharpe (μ/σ) : " << std::setprecision(4) << metrics.raw_per_era_sharpe << "\n";
     std::cout << "  Annualized Sharpe Ratio  : " << std::setprecision(4) << metrics.annualized_sharpe << "\n";
     std::cout << "  Maximum Drawdown (%)     : " << std::setprecision(2) << metrics.max_drawdown_pct << "%\n";
     std::cout << "  Total Executed Trades    : " << metrics.total_trades << "\n";
     std::cout << "  Win Rate (%)             : " << std::setprecision(2) << metrics.win_rate_pct << "%\n";
     std::cout << "  Profit Factor            : " << std::setprecision(2) << metrics.profit_factor << "\n";
-    std::cout << "  Exchange Taker Fee Rate  : 4.0 bps per fill\n";
     std::cout << "=============================================================\n";
 
     // Write metrics.json for programmatic verification

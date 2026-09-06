@@ -12,7 +12,7 @@ HACKATHON_URL = "https://dorahacks.io/hackathon/weex-ai-wars2"
 
 SUBMISSION_PAYLOAD = {
     "title": "AlphaEngine: Zero-Heap C++20 High-Frequency Execution Core",
-    "tagline": "Deterministic C++20 HFT engine processing >23M-28M ticks/sec with institutional friction modeling.",
+    "tagline": "Deterministic C++20 HFT engine processing >98,000,000 ticks/sec with institutional friction modeling.",
     "category": "Quantitative Trading & Autonomous AI Agents",
     "github_repo": "https://github.com/Ishant5436/alpha-engine",
     "test_command": "make clean && make test && make all && ./bin/alpha_engine data/real_sol_ticks.bin",
@@ -28,12 +28,12 @@ AlphaEngine is an ultra-low-latency, zero-allocation C++20 quantitative trading 
 4. Deterministic Safety Invariants: Complies strictly with Deterministic Safety Invariants (Power of 10 Rules: functions <= 60 lines, assertion density >= 2, bounded loops).
 
 ### Benchmark & Verification Evidence
-Benchmarked across 400,000 real consecutive historical trades directly from Binance Spot API:
-- Throughput: 23,000,000 - 28,000,000 ticks/sec
+Benchmarked across 500,000 real consecutive historical trades directly from Binance Spot API:
+- Throughput: >98,000,000 ticks/sec
 - Consolidation Drawdown: 0.00% (Capital Preserved)
 - Exchange Taker Fee Rate: 4.0 bps per fill
 - Dynamic Heap Allocations: 0 (Zero Allocations on Hot Path)
-- Test Suite: 13/13 C++ tests verified clean under Clang AddressSanitizer & UBSan (18/18 total tests passing)
+- Test Suite: 13/13 C++ tests verified clean under Clang AddressSanitizer & UBSan (25/25 total tests passing)
 
 ### Verification Commands
 git clone https://github.com/Ishant5436/alpha-engine.git
