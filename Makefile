@@ -43,7 +43,11 @@ asan: tests/test_whitebox.cpp tests/test_runner.cpp
 demo: all
 	@python3 scripts/record_demo_walkthrough.py
 
+lint:
+	/Users/ishantpanchal/.local/bin/ruff check tests/ scripts/
+	python3 scripts/audit_safety_invariants.py
+
 clean:
 	rm -rf bin/ *.dSYM metrics.json .pytest_cache
 
-.PHONY: all live test asan demo clean
+.PHONY: all live test asan demo clean lint

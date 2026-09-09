@@ -10,6 +10,7 @@ import datetime
 import json
 import time
 import os
+import sys
 
 LOG_FILE = os.path.expanduser("~/.gemini/weex_watcher.log")
 HACKATHON_URL = "https://dorahacks.io/hackathon/weex-ai-wars2"
@@ -46,8 +47,6 @@ def check_portal():
         return json.loads(res)
     except Exception as e:
         return {"error": str(e)}
-
-import sys
 
 def main():
     loop_mode = "--loop" in sys.argv or "-l" in sys.argv

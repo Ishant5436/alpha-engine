@@ -59,7 +59,7 @@ def audit_file(filepath: str) -> list[dict]:
             issues.append({"rule": 8, "file": filename, "line": idx, "msg": f"Macro definition found: {line}"})
 
         # Rule 9: Check for double/triple pointer dereferencing
-        if re.search(r"\*\s*\*\s*[a-zA-Z_]", line) and not "static_cast" in line:
+        if re.search(r"\*\s*\*\s*[a-zA-Z_]", line) and "static_cast" not in line:
             issues.append({"rule": 9, "file": filename, "line": idx, "msg": f"Multiple pointer dereferencing found: {line}"})
 
         # Rule 4 & 5: Function boundary & assertion tracking

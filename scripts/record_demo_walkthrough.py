@@ -48,7 +48,7 @@ def main():
     for sym, path in assets:
         print(f"\n--- Testing Asset: {sym} ({path}) ---")
         out, err, code = run_cmd(f"{PROJECT_ROOT}/bin/alpha_engine {PROJECT_ROOT}/{path}")
-        lines = [l.strip() for l in out.splitlines() if l.strip()]
+        lines = [line_item.strip() for line_item in out.splitlines() if line_item.strip()]
         for line in lines[-8:]:
             print(f"  {line}")
 

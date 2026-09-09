@@ -1,10 +1,12 @@
+import os
 import struct
 
 ticks = []
 with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'ticks_500k.bin'), 'rb') as f:
     while True:
         data = f.read(56)
-        if not data: break
+        if not data:
+            break
         ts, bid, ask, bsz, asz, last, vol = struct.unpack('Qdddddd', data)
         ticks.append((last, bid, ask))
 
@@ -39,13 +41,15 @@ for i, (p, bid, ask) in enumerate(ticks):
         if signal < 0.0 or (p - entry_price) < -30.0:
             pnl = (bid - entry_price) * (10000.0 / entry_price) # 1x leverage $10k
             realized_pnl += pnl
-            if pnl > 0: wins += 1
+            if pnl > 0:
+                wins += 1
             position = 0
     elif position == -1:
         if signal > 0.0 or (entry_price - p) < -30.0:
             pnl = (entry_price - ask) * (10000.0 / entry_price)
             realized_pnl += pnl
-            if pnl > 0: wins += 1
+            if pnl > 0:
+                wins += 1
             position = 0
 
 print(f"Results: Trades={trades}, Wins={wins} ({100*wins/max(1,trades):.1f}%), Realized PnL=${realized_pnl:.2f}")

@@ -6,7 +6,8 @@ ticks = []
 with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'real_btc_ticks.bin'), 'rb') as f:
     while True:
         data = f.read(56)
-        if not data: break
+        if not data:
+            break
         ts, bid, ask, bsz, asz, last, vol = struct.unpack('Qdddddd', data)
         ticks.append((last, bid, ask, vol))
 

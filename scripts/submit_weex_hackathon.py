@@ -5,8 +5,6 @@ Executes via local Brave Browser automation on September 2, 2026 when submission
 """
 
 import subprocess
-import json
-import time
 
 HACKATHON_URL = "https://dorahacks.io/hackathon/weex-ai-wars2"
 

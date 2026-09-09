@@ -41,7 +41,7 @@ def fetch_real_trades(symbol="SOLUSDT", target_ticks=100000, output_path="data/r
 
                 current_start = trades[-1]['T'] + 1
                 time.sleep(0.01)
-        except Exception as e:
+        except Exception:
             current_start += window_ms
 
     if not all_ticks:
