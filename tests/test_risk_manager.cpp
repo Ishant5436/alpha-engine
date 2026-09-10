@@ -25,7 +25,7 @@ void test_risk_manager_drawdown_killswitch() {
     assert(rm.position().size == 0.0); // Flattened
 
     // Subsequent orders must be rejected
-    alpha::AlphaSignal buy_sig{0.8, 0.5, 0.001, 0.8, true};
+    alpha::AlphaSignal buy_sig{.composite_signal = 1.0, .is_valid = true};
     double target = rm.calculate_target_position(buy_sig, 50.0);
     assert(target == 0.0);
 
