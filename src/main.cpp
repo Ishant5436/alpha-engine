@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    const double fee_rate = (argc > 2) ? std::stod(argv[2]) : 0.0004; // Institutional 4 bps taker fee default
+
     alpha::Backtester backtester(
         10000.0,  // Initial Capital ($10,000)
         0.005,    // Fast EMA alpha
@@ -41,7 +43,7 @@ int main(int argc, char* argv[]) {
         0.0005,   // Slow EMA alpha
         0.04,     // 4.0% Max Drawdown Kill-Switch
         1.0,      // 1.0x Safe Leverage
-        0.0       // 0.0 fee rate for baseline alpha signal evaluation
+        fee_rate  // Real exchange fee rate (4.0 bps default)
     );
 
     const auto metrics = backtester.run(ticks.data(), ticks.size());
