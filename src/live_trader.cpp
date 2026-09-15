@@ -45,8 +45,18 @@ int main(int argc, char* argv[]) {
     std::string line;
     std::uint64_t tick_count = 0;
 
-    // Clear screen
-    std::cout << "\033[2J\033[H";
+    bool pipe_mode = false;
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+        if (arg == "--pipe" || arg == "--daemon") {
+            pipe_mode = true;
+        }
+    }
+
+    // Clear screen if interactive
+    if (!pipe_mode) {
+        std::cout << "\033[2J\033[H";
+    }
 
     while (std::getline(std::cin, line)) {
         if (line.empty()) continue;
@@ -96,6 +106,15 @@ int main(int argc, char* argv[]) {
                 const double trade_pnl = pos.realized_pnl - prev_realized;
                 if (trade_pnl > 0.0) winning_trades++;
 
+                if (pipe_mode) {
+                    std::cout << "ORDER " << symbol << " "
+                              << (side == OrderSide::BUY ? "BUY" : "SELL") << " "
+                              << (target_size > 0 ? "LONG" : (target_size < 0 ? "SHORT" : "FLAT")) << " "
+                              << std::fixed << std::setprecision(6) << fill_qty << " "
+                              << std::setprecision(2) << fill_price << " "
+                              << std::setprecision(4) << sig.composite_signal << "\n" << std::flush;
+                }
+
                 if (fill_history.size() < MAX_FILL_HISTORY) {
                     fill_history.push_back({
                         (side == OrderSide::BUY ? "BUY" : "SELL"),
@@ -110,7 +129,7 @@ int main(int argc, char* argv[]) {
         }
 
         // Render Live ANSI Terminal Dashboard (every 5 ticks)
-        if (tick_count % 5 == 0) {
+        if (!pipe_mode && tick_count % 5 == 0) {
             std::cout << "\033[H"; // Move cursor to top-left
             std::cout << "\033[1;36m================================================================================\033[0m\n";
             std::cout << "\033[1;37m        ALPHAENGINE LIVE WEBSOCKET FORWARD PAPER TRADER (BINANCE SPOT)        \033[0m\n";
@@ -169,21 +188,26 @@ int main(int argc, char* argv[]) {
     }
 
     const auto& pos = risk_mgr.position();
-    std::cout << "\n================================================================================\n";
-    std::cout << "        ALPHAENGINE LIVE FORWARD PAPER TRADING SESSION SUMMARY\n";
-    std::cout << "================================================================================\n";
-    std::cout << "  Symbol           : " << symbol << "\n";
-    std::cout << "  Total Ticks      : " << tick_count << "\n";
-    if (ring.size() > 0) {
-        std::cout << "  Final Price      : $" << std::fixed << std::setprecision(2) << ring.latest().last_price << "\n";
-        std::cout << "  Final VWAP       : $" << std::setprecision(2) << ring.vwap() << "\n";
+    if (!pipe_mode) {
+        std::cout << "\n================================================================================\n";
+        std::cout << "        ALPHAENGINE LIVE FORWARD PAPER TRADING SESSION SUMMARY\n";
+        std::cout << "================================================================================\n";
+        std::cout << "  Symbol           : " << symbol << "\n";
+        std::cout << "  Total Ticks      : " << tick_count << "\n";
+        if (ring.size() > 0) {
+            std::cout << "  Final Price      : $" << std::fixed << std::setprecision(2) << ring.latest().last_price << "\n";
+            std::cout << "  Final VWAP       : $" << std::setprecision(2) << ring.vwap() << "\n";
+        }
+        std::cout << "  Initial Capital  : $" << std::setprecision(2) << initial_capital << "\n";
+        std::cout << "  Final Equity     : $" << std::setprecision(2) << pos.current_equity << "\n";
+        std::cout << "  Realized PnL     : $" << std::setprecision(2) << pos.realized_pnl << "\n";
+        std::cout << "  Taker Fees Paid  : $" << std::setprecision(2) << risk_mgr.cumulative_fees() << "\n";
+        std::cout << "  Total Trades     : " << total_trades << "\n";
+        std::cout << "================================================================================\n";
+    } else {
+        std::cout << "SUMMARY " << symbol << " " << tick_count << " " << total_trades << " "
+                  << std::fixed << std::setprecision(2) << pos.realized_pnl << "\n" << std::flush;
     }
-    std::cout << "  Initial Capital  : $" << std::setprecision(2) << initial_capital << "\n";
-    std::cout << "  Final Equity     : $" << std::setprecision(2) << pos.current_equity << "\n";
-    std::cout << "  Realized PnL     : $" << std::setprecision(2) << pos.realized_pnl << "\n";
-    std::cout << "  Taker Fees Paid  : $" << std::setprecision(2) << risk_mgr.cumulative_fees() << "\n";
-    std::cout << "  Total Trades     : " << total_trades << "\n";
-    std::cout << "================================================================================\n";
 
     return 0;
 }
