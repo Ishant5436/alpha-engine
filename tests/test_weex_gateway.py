@@ -20,6 +20,7 @@ from scripts.weex_gateway import (
     normalize_weex_trade,
     build_weex_order_payload,
     WeexRestClient,
+    CompetitionStabilityShield,
 )
 
 
@@ -170,3 +171,104 @@ def test_dry_run_safety_invariant():
         assert result["symbol"] == "BTCUSDT"
 
     asyncio.run(_test())
+
+
+def test_stability_shield_initialization_and_invariants():
+    """Verify input validation and default state for CompetitionStabilityShield."""
+    shield = CompetitionStabilityShield(starting_equity=10000.0, max_daily_drawdown_pct=0.02, min_flat_pct=0.80)
+    assert shield.starting_equity == 10000.0
+    assert shield.current_equity == 10000.0
+    assert shield.max_daily_drawdown_pct == 0.02
+    assert not shield.is_tripped
+    assert shield.can_open_order(is_closing=False)
+    assert shield.flat_ratio == 1.0
+
+
+def test_stability_shield_drawdown_trips_circuit_breaker():
+    """Verify circuit breaker trips at 2% drawdown and blocks entries but allows exits."""
+    shield = CompetitionStabilityShield(starting_equity=10000.0, max_daily_drawdown_pct=0.02)
+
+    # 1.0% drop: starting 10,000 -> 9,900 (drawdown 1.0% < 2.0%)
+    intact = shield.update_equity(9900.0)
+    assert intact
+    assert not shield.is_tripped
+    assert shield.can_open_order(is_closing=False)
+
+    # 2.0% drop: 10,000 -> 9,800 (drawdown 2.0% >= 2.0% threshold)
+    intact = shield.update_equity(9800.0)
+    assert not intact
+    assert shield.is_tripped
+    # New entries blocked
+    assert not shield.can_open_order(is_closing=False)
+    # Closing exits must ALWAYS be permitted
+    assert shield.can_open_order(is_closing=True)
+
+
+def test_stability_shield_daily_reset():
+    """Verify circuit breaker reset restores order entry permissions."""
+    shield = CompetitionStabilityShield(starting_equity=10000.0, max_daily_drawdown_pct=0.02)
+    shield.update_equity(9700.0)  # 3% drawdown -> trips
+    assert shield.is_tripped
+
+    # Daily rollover at 00:00 UTC resets equity baseline
+    shield.reset_daily(new_starting_equity=9700.0)
+    assert not shield.is_tripped
+    assert shield.starting_equity == 9700.0
+    assert shield.can_open_order(is_closing=False)
+
+
+def test_stability_shield_flat_residency_tracking():
+    """Verify tracking of time spent in FLAT state to prevent retail taker fee bleed."""
+    shield = CompetitionStabilityShield(starting_equity=10000.0)
+
+    # 8 ticks in FLAT state (position_size = 0.0)
+    for _ in range(8):
+        shield.update_tick(price=60000.0, position_size=0.0)
+
+    # 2 ticks in active position (position_size = 0.5)
+    for _ in range(2):
+        shield.update_tick(price=60100.0, position_size=0.5)
+
+    assert shield.total_ticks == 10
+    assert shield.flat_ticks == 8
+    assert shield.flat_ratio == 0.80  # Exactly 80% FLAT state
+
+
+def test_rest_client_circuit_breaker_blocks_entry():
+    """Verify WeexRestClient blocks entry orders when shield is tripped, but allows exits."""
+    async def _test():
+        shield = CompetitionStabilityShield(starting_equity=10000.0, max_daily_drawdown_pct=0.02)
+        shield.update_equity(9750.0)  # 2.5% drawdown -> tripped
+        assert shield.is_tripped
+
+        signer = WeexSigner("k", "s", "p")
+        client = WeexRestClient(signer=signer, dry_run=True, stability_shield=shield)
+
+        # Entry order: BUY to open LONG -> must be BLOCKED
+        entry_payload = {
+            "symbol": "BTCUSDT",
+            "side": "BUY",
+            "type": "LIMIT",
+            "quantity": "0.01",
+            "price": "60000.00",
+            "positionSide": "LONG"
+        }
+        res_entry = await client.place_order(entry_payload)
+        assert res_entry["error"] is True
+        assert res_entry["status"] == "CIRCUIT_BREAKER_BLOCKED"
+
+        # Exit order: SELL to close LONG -> must be ALLOWED
+        exit_payload = {
+            "symbol": "BTCUSDT",
+            "side": "SELL",
+            "type": "LIMIT",
+            "quantity": "0.01",
+            "price": "60500.00",
+            "positionSide": "LONG"
+        }
+        res_exit = await client.place_order(exit_payload)
+        assert res_exit["status"] == "DRY_RUN_SIMULATED"
+        assert res_exit["orderId"].startswith("SIM-")
+
+    asyncio.run(_test())
+
