@@ -23,7 +23,7 @@ public:
         position_.current_equity = initial_capital_;
     }
 
-    [[nodiscard]] double calculate_target_position(const AlphaSignal& signal, double current_price) noexcept {
+    [[nodiscard]] double calculate_target_position(const AlphaSignal& signal, double current_price) const noexcept {
         assert(current_price > 0.0);
         assert(position_.current_equity >= 0.0);
 
@@ -92,7 +92,7 @@ public:
             position_.entry_price = fill_price;
             position_.size = new_size;
         } else if ((old_size > 0.0 && signed_size > 0.0) || (old_size < 0.0 && signed_size < 0.0)) {
-            position_.entry_price = (position_.entry_price * std::abs(old_size) + fill_price * fill_size) / std::abs(new_size);
+            position_.entry_price = ((position_.entry_price * std::abs(old_size)) + (fill_price * fill_size)) / std::abs(new_size);
             position_.size = new_size;
         } else {
             const double closed_size = std::min(std::abs(old_size), fill_size);

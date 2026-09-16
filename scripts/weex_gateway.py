@@ -373,6 +373,7 @@ class WeexRestClient:
         )
 
         url = f"{self.base_url}{path}"
+        assert url.startswith("https://"), "URL must use https scheme"
         req = urllib.request.Request(
             url,
             data=body_str.encode("utf-8"),

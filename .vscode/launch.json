@@ -1,0 +1,65 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug AlphaEngine (C++ LLDB)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/alpha_engine",
+      "args": ["${workspaceFolder}/data/real_btc_ticks.bin"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-debug",
+      "stopOnEntry": false
+    },
+    {
+      "name": "Debug Live Trader (C++ LLDB)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/live_trader",
+      "args": ["BTCUSDT", "10000.0", "--pipe"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-live-debug",
+      "stopOnEntry": false
+    },
+    {
+      "name": "Debug White-Box Invariants (C++ LLDB)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/test_whitebox",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build-tests",
+      "stopOnEntry": false
+    },
+    {
+      "name": "Debug WEEX Gateway (Python)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/weex_gateway.py",
+      "args": ["--mock"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug WEEX FastMCP Server (Python)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/weex_mcp_server.py",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug Pytest Suite (Python)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/", "-v"],
+      "cwd": "${workspaceFolder}",
+      "python": "${workspaceFolder}/.venv/bin/python",
+      "console": "integratedTerminal"
+    }
+  ]
+}

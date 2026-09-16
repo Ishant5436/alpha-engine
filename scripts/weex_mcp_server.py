@@ -52,6 +52,7 @@ def weex_ticker(symbol: str = "cmt_btcusdt") -> str:
     assert len(clean_sym) > 0, "symbol must not be empty"
 
     url = f"{_CLIENT.base_url}/capi/v3/market/ticker?symbol={clean_sym}"
+    assert url.startswith("https://"), "URL must use https scheme"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "AlphaEngine/1.0"})
         with urllib.request.urlopen(req, timeout=5.0) as resp:
@@ -90,6 +91,7 @@ def weex_orderbook(symbol: str = "cmt_btcusdt", depth: int = 20) -> str:
     clean_sym = symbol.strip().lower()
 
     url = f"{_CLIENT.base_url}/capi/v3/market/depth?symbol={clean_sym}&limit={depth}"
+    assert url.startswith("https://"), "URL must use https scheme"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "AlphaEngine/1.0"})
         with urllib.request.urlopen(req, timeout=5.0) as resp:

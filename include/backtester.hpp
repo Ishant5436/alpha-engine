@@ -120,7 +120,11 @@ public:
         metrics.winning_trades = winning_trades;
         metrics.losing_trades = losing_trades;
         metrics.win_rate_pct = (metrics.total_trades > 0) ? (100.0 * static_cast<double>(winning_trades) / static_cast<double>(metrics.total_trades)) : 0.0;
-        metrics.profit_factor = (gross_loss > 0.0) ? (gross_profit / gross_loss) : ((gross_profit > 0.0) ? 99.0 : 1.0);
+        if (gross_loss > 0.0) {
+            metrics.profit_factor = gross_profit / gross_loss;
+        } else {
+            metrics.profit_factor = (gross_profit > 0.0) ? 99.0 : 1.0;
+        }
 
         const double final_equity = risk_manager_.position().current_equity;
         metrics.total_return_pct = 100.0 * (final_equity - initial_capital_) / initial_capital_;

@@ -1,0 +1,36 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-debug",
+      "type": "shell",
+      "command": "clang++ -std=c++20 -g -O0 -Wall -Wextra -Werror -pedantic -Wno-error=invalid-feature-combination -march=native -Iinclude src/main.cpp -o bin/alpha_engine",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "build-live-debug",
+      "type": "shell",
+      "command": "clang++ -std=c++20 -g -O0 -Wall -Wextra -Werror -pedantic -Wno-error=invalid-feature-combination -march=native -Iinclude src/live_trader.cpp -o bin/live_trader",
+      "group": "build",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "build-tests",
+      "type": "shell",
+      "command": "make test",
+      "group": "test",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "run-qa",
+      "type": "shell",
+      "command": "make qa",
+      "group": "test",
+      "problemMatcher": ["$gcc"]
+    }
+  ]
+}

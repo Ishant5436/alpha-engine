@@ -15,8 +15,11 @@ def print_header(title):
     print(f"  {title.center(66)}")
     print("=" * 70)
 
+import shlex
+
 def run_cmd(cmd):
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    args = shlex.split(cmd) if isinstance(cmd, str) else cmd
+    p = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
     return out, err, p.returncode
 
