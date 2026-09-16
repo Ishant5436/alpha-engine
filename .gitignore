@@ -8,3 +8,5 @@ __pycache__/
 data/*.bin
 data/*.csv
 metrics.json
+.venv/
+*.log

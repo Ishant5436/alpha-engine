@@ -21,8 +21,7 @@ test: bin/test_runner bin/test_whitebox
 	@./bin/test_whitebox
 	@echo "=== Running Static Safety Invariant Analyzer ==="
 	@python3 scripts/audit_safety_invariants.py
-	@echo "=== Running Black-Box & Gateway Integration Tests ==="
-	@python3 -m pytest tests/ -v
+	@PYTHONPATH=. python3 -m pytest tests/ -v
 
 bin/test_runner: tests/test_runner.cpp
 	@mkdir -p bin

@@ -279,6 +279,23 @@ class CompetitionStabilityShield:
             return 1.0
         return self.flat_ticks / self.total_ticks
 
+    def get_metrics(self) -> Dict[str, Any]:
+        """Return deterministic risk telemetry metrics."""
+        assert self.starting_equity > 0.0, "starting_equity must be positive"
+        assert self.current_equity > 0.0, "current_equity must be positive"
+        drawdown_pct = max(0.0, (self.starting_equity - self.current_equity) / self.starting_equity)
+        return {
+            "starting_equity": self.starting_equity,
+            "current_equity": self.current_equity,
+            "peak_equity": self.peak_equity,
+            "drawdown_pct": round(drawdown_pct * 100.0, 4),
+            "max_daily_drawdown_limit_pct": round(self.max_daily_drawdown_pct * 100.0, 2),
+            "circuit_breaker_tripped": self.is_tripped,
+            "flat_ratio_pct": round(self.flat_ratio * 100.0, 2),
+            "total_ticks": self.total_ticks,
+            "flat_ticks": self.flat_ticks
+        }
+
     def reset_daily(self, new_starting_equity: Optional[float] = None) -> None:
         """Reset circuit breaker at 00:00 UTC rollover."""
         assert self.current_equity > 0.0, "current_equity must be positive"

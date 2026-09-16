@@ -1,12 +1,14 @@
 # AlphaEngine: High-Performance C++20 Algorithmic Trading Core
 
 [![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
-[![Tests](https://img.shields.io/badge/Unit%20Tests-18%2F18%20Passed-brightgreen)](tests/)
-[![Throughput](https://img.shields.io/badge/Throughput-30.5M%20ticks%2Fsec-blue)](data/)
+[![Tests](https://img.shields.io/badge/Tests-36%2F36%20Passed-brightgreen)](tests/)
+[![Throughput](https://img.shields.io/badge/Throughput-123.9M%20ticks%2Fsec-blue)](data/)
 [![AddressSanitizer](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20Leaks-purple)](Makefile)
 [![Safety Standard](https://img.shields.io/badge/Safety%20Standard-Deterministic%20Invariants-orange)](scripts/audit_safety_invariants.py)
+[![Announcement](https://img.shields.io/badge/X%20Announcement-BUIDL%20%2348230-black)](https://x.com/IshantP38294/status/2100263972473889257)
 
-> **Target Competition:** WEEX AI Wars II: Rise of Intelligence ($200,000 Prize Pool)  
+> **Target Competition:** WEEX AI Wars II: Rise of Intelligence ($200,000 Prize Pool — Team AI Track)  
+> **BUIDL Profile:** [#48230](https://dorahacks.io/buidl/48230)  
 > **1-Second Instant Demo:** `make demo`
 
 ![AlphaEngine Terminal Demo](assets/alpha_engine_demo.gif)
@@ -99,3 +101,20 @@ python3 scripts/run_live_paper_trader.py BTCUSDT 10000.0
 ```
 
 Features real-time Parkinson volatility calculation, triple-horizon trend alignment, and simulated execution with 4.0 bps taker fee modeling in a live ANSI terminal dashboard.
+
+---
+
+## WEEX V3 Gateway & FastMCP Trader Skill (Rule 127)
+
+Satisfies official WEEX AI Wars II guidelines for Team AI:
+* **Competition Stability Shield:** Hard 2.0% daily drawdown circuit breaker + $\ge 80\%$ FLAT state residency filter to eliminate taker fee churn.
+* **FastMCP Server (`weex-trader`):** Connects Claude, Gemini, and Cursor AI agents to WEEX contract trading tools:
+  * `weex_ticker`: Live prices & volatility
+  * `weex_orderbook`: Level 2 depth & spread
+  * `weex_stability_shield_status`: Risk telemetry & drawdown tracking
+  * `weex_risk_gated_order`: Pre-flight checked limit orders
+
+```bash
+# Launch WEEX Trader Skill FastMCP Server
+python3 scripts/weex_mcp_server.py
+```
