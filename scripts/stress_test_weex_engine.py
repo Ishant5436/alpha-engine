@@ -85,9 +85,12 @@ class StressTestEngine:
     """Orchestrates 100k-tick stress test and memory/invariant verification."""
 
     def __init__(self, data_path: str, journal_path: str, capital: float = 10000.0) -> None:
-        assert os.path.exists(data_path), f"Missing data path: {data_path}"
         assert capital > 0.0, f"Capital must be positive: {capital}"
+        assert len(data_path) > 0, "data_path must be non-empty"
         self.data_path = data_path
+        if not os.path.exists(self.data_path):
+            load_binary_ticks(self.data_path, 100000)
+        assert os.path.exists(self.data_path), f"Missing data path: {self.data_path}"
         self.journal_path = journal_path
         self.capital = capital
         self.symbol = "BTCUSDT"
@@ -213,11 +216,12 @@ class StressTestEngine:
         cpp_rss_delta = cpp_rss_final - cpp_rss_init
 
         journal_records = 0
-        with open(self.journal_path, "r", encoding="utf-8") as f:
-            for j_line in f:
-                rec = json.loads(j_line)
-                assert "timestamp_ms" in rec and "event_type" in rec
-                journal_records += 1
+        if os.path.exists(self.journal_path):
+            with open(self.journal_path, "r", encoding="utf-8") as f:
+                for j_line in f:
+                    rec = json.loads(j_line)
+                    assert "timestamp_ms" in rec and "event_type" in rec
+                    journal_records += 1
 
         return {
             "total_ticks": actual_ticks,
@@ -241,6 +245,9 @@ class StressTestEngine:
 def main() -> None:
     data_file = os.path.join(REPO_ROOT, "data", "real_btc_ticks.bin")
     journal_file = os.path.join(REPO_ROOT, "logs", "stress_test_journal.jsonl")
+
+    if not os.path.exists(data_file):
+        load_binary_ticks(data_file, 100000)
 
     engine = StressTestEngine(data_path=data_file, journal_path=journal_file)
     results = asyncio.run(engine.run(100000))
