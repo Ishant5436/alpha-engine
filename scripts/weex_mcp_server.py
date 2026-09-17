@@ -55,6 +55,7 @@ def weex_ticker(symbol: str = "cmt_btcusdt") -> str:
     assert url.startswith("https://"), "URL must use https scheme"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "AlphaEngine/1.0"})
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
         with urllib.request.urlopen(req, timeout=5.0) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             return json.dumps({
@@ -94,6 +95,7 @@ def weex_orderbook(symbol: str = "cmt_btcusdt", depth: int = 20) -> str:
     assert url.startswith("https://"), "URL must use https scheme"
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "AlphaEngine/1.0"})
+        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
         with urllib.request.urlopen(req, timeout=5.0) as resp:
             data = json.loads(resp.read().decode("utf-8"))
             bids = data.get("bids", [])

@@ -10,3 +10,5 @@ data/*.csv
 metrics.json
 .venv/
 *.log
+logs/
+*.jsonl

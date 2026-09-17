@@ -13,15 +13,23 @@ import base64
 import hashlib
 import hmac
 import json
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from scripts.weex_gateway import (
     WeexSigner,
     TokenBucketLimiter,
     normalize_weex_trade,
+    normalize_binance_trade,
     build_weex_order_payload,
     WeexRestClient,
     CompetitionStabilityShield,
+    ExecutionJournal,
+    ResilientWebSocketStreamer,
 )
+
 
 
 def test_weex_signature_vector():
@@ -271,4 +279,70 @@ def test_rest_client_circuit_breaker_blocks_entry():
         assert res_exit["orderId"].startswith("SIM-")
 
     asyncio.run(_test())
+
+
+def test_binance_trade_normalization():
+    """Verify Binance trade stream normalization into live_trader pipe format."""
+    raw_msg = json.dumps({
+        "e": "trade",
+        "E": 1726417205000,
+        "s": "BTCUSDT",
+        "t": 1234567,
+        "p": "60300.50",
+        "q": "0.2500",
+        "T": 1726417205000,
+        "m": False  # buyer is taker -> BUY
+    })
+    tick_line = normalize_binance_trade(raw_msg)
+    assert tick_line == "1726417205000 60300.50 0.2500 BUY"
+
+    # Sell trade (m is True -> seller is taker -> SELL)
+    raw_sell = json.dumps({
+        "p": "60290.00",
+        "q": "0.1000",
+        "T": 1726417206000,
+        "m": True
+    })
+    assert normalize_binance_trade(raw_sell) == "1726417206000 60290.00 0.1000 SELL"
+    assert normalize_binance_trade("invalid") is None
+
+
+def test_execution_journal_logging(tmp_path):
+    """Verify ExecutionJournal appends structured JSONL records without corruption."""
+    import os
+    journal_file = str(tmp_path / "test_journal.jsonl")
+    journal = ExecutionJournal(log_path=journal_file)
+
+    event = {
+        "event_type": "ORDER_PLACED",
+        "symbol": "BTCUSDT",
+        "side": "BUY",
+        "position_side": "LONG",
+        "price": 60150.0,
+        "quantity": 0.05,
+        "mode": "DRY_RUN",
+        "client_order_id": "ALPHA-TEST-1",
+        "drawdown_pct": 0.15,
+        "flat_ratio_pct": 85.0
+    }
+    journal.record_event(event)
+
+    assert os.path.exists(journal_file)
+    with open(journal_file, "r") as f:
+        lines = f.readlines()
+    assert len(lines) == 1
+    parsed = json.loads(lines[0])
+    assert parsed["event_type"] == "ORDER_PLACED"
+    assert parsed["client_order_id"] == "ALPHA-TEST-1"
+    assert "timestamp_ms" in parsed
+
+
+def test_resilient_streamer_backoff_calculation():
+    """Verify exponential backoff calculation remains bounded between 1s and 30s."""
+    streamer = ResilientWebSocketStreamer(symbol="BTCUSDT")
+    assert streamer.calculate_backoff(0) == 1.0
+    assert streamer.calculate_backoff(1) == 1.5
+    assert streamer.calculate_backoff(2) == 2.25
+    # Must cap at max 30.0s
+    assert streamer.calculate_backoff(20) == 30.0
 

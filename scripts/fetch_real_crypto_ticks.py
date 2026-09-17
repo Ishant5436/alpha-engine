@@ -25,6 +25,7 @@ def fetch_real_trades(symbol="SOLUSDT", target_ticks=100000, output_path="data/r
         url = f"https://api.binance.com/api/v3/aggTrades?symbol={symbol}&startTime={current_start}&endTime={current_start + window_ms}&limit=1000"
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+            # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected.dynamic-urllib-use-detected
             with urllib.request.urlopen(req, timeout=5) as resp:
                 trades = json.loads(resp.read().decode('utf-8'))
                 if not trades:
