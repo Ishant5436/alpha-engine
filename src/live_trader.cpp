@@ -60,14 +60,16 @@ int main(int argc, char* argv[]) {
 
     while (std::getline(std::cin, line)) {
         if (line.empty()) continue;
-        std::stringstream ss(line);
-        std::uint64_t ts_ms = 0;
-        double price = 0.0, qty = 0.0;
-        std::string side_str;
-
-        if (!(ss >> ts_ms >> price >> qty >> side_str) || price <= 0.0 || qty <= 0.0) {
-            continue;
-        }
+        const char* ptr = line.c_str();
+        char* end_ptr = nullptr;
+        const std::uint64_t ts_ms = std::strtoull(ptr, &end_ptr, 10);
+        if (ptr == end_ptr) continue;
+        ptr = end_ptr;
+        const double price = std::strtod(ptr, &end_ptr);
+        if (ptr == end_ptr || price <= 0.0) continue;
+        ptr = end_ptr;
+        const double qty = std::strtod(ptr, &end_ptr);
+        if (ptr == end_ptr || qty <= 0.0) continue;
 
         tick_count++;
         const double spread = std::max(0.01, price * 0.0001);
