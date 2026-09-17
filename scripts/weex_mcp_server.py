@@ -145,6 +145,19 @@ def weex_stability_shield_status() -> str:
     }, indent=2)
 
 
+def _run_coroutine_sync(coro):
+    import concurrent.futures
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = None
+    if loop and loop.is_running():
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
+            return pool.submit(asyncio.run, coro).result()
+    else:
+        return asyncio.run(coro)
+
+
 @mcp.tool()
 def weex_risk_gated_order(
     symbol: str,
@@ -194,7 +207,7 @@ def weex_risk_gated_order(
     }
 
     _CLIENT.dry_run = dry_run
-    res = asyncio.run(_CLIENT.place_order(payload))
+    res = _run_coroutine_sync(_CLIENT.place_order(payload))
     return json.dumps({
         "status": "success" if res.get("status") in ("DRY_RUN_SIMULATED", "DRY_RUN_ACCEPTED") or res.get("code") == "00000" else "failed",
         "dry_run": dry_run,
