@@ -16,12 +16,11 @@ def print_header(title):
     print("=" * 70)
 
 import struct
+import shlex
 
 def run_cmd(cmd, cwd=None):
-    if isinstance(cmd, str):
-        p = subprocess.Popen(cmd, shell=True, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    else:
-        p = subprocess.Popen(cmd, shell=False, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    args = shlex.split(cmd) if isinstance(cmd, str) else cmd
+    p = subprocess.Popen(args, shell=False, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
     return out, err, p.returncode
 
@@ -49,7 +48,7 @@ def main():
     PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     print("[1/3] Compiling optimized C++20 release binary...")
-    out, err, code = run_cmd(f"cd {PROJECT_ROOT} && make all")
+    out, err, code = run_cmd(["make", "all"], cwd=PROJECT_ROOT)
     if code != 0:
         print("Compilation failed:\n", err)
         sys.exit(1)
