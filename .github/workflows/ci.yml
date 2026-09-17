@@ -21,14 +21,19 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Python test tools
-        run: pip install pytest
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Compile and Run Unit & White-Box Tests
         run: make test
 
       - name: Run Clang AddressSanitizer & UBSan Memory Audit
         run: make asan
+
+      - name: Run 100k-Tick Stress Harness
+        run: make stress
 
       - name: Execute End-to-End Demo Walkthrough
         run: make demo

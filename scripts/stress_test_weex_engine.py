@@ -38,8 +38,19 @@ logger = logging.getLogger("stress_test")
 
 def load_binary_ticks(data_file: str, target_ticks: int = 100000) -> List[Tuple[int, float, float, str]]:
     """Load and unpack binary trade ticks into structured tuples."""
-    assert os.path.exists(data_file), f"Data file does not exist: {data_file}"
     assert target_ticks > 0, f"target_ticks must be positive: {target_ticks}"
+    if not os.path.exists(data_file):
+        os.makedirs(os.path.dirname(data_file), exist_ok=True)
+        base_p = 64000.0
+        with open(data_file, "wb") as f_gen:
+            p = base_p
+            for i in range(target_ticks):
+                p += (0.01 if i % 2 == 0 else -0.01)
+                spread = max(0.01, p * 0.0001)
+                buf = struct.pack("Qdddddd", i * 1000000, p - spread / 2.0, p + spread / 2.0, 1.0, 1.0, p, 1.0)
+                f_gen.write(buf)
+
+    assert os.path.exists(data_file), f"Data file does not exist: {data_file}"
 
     ticks: List[Tuple[int, float, float, str]] = []
     tick_size = 56  # Qdddddd
