@@ -15,13 +15,27 @@ def print_header(title):
     print(f"  {title.center(66)}")
     print("=" * 70)
 
-import shlex
+import struct
 
-def run_cmd(cmd):
-    args = shlex.split(cmd) if isinstance(cmd, str) else cmd
-    p = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+def run_cmd(cmd, cwd=None):
+    if isinstance(cmd, str):
+        p = subprocess.Popen(cmd, shell=True, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    else:
+        p = subprocess.Popen(cmd, shell=False, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     out, err = p.communicate()
     return out, err, p.returncode
+
+def ensure_dataset(filepath: str, base_price: float) -> None:
+    if os.path.exists(filepath):
+        return
+    os.makedirs(os.path.dirname(filepath), exist_ok=True)
+    with open(filepath, "wb") as f:
+        p = base_price
+        for i in range(10000):
+            p += (0.01 if i % 2 == 0 else -0.01)
+            spread = max(0.01, p * 0.0001)
+            buf = struct.pack("Qdddddd", i * 1000000, p - spread / 2.0, p + spread / 2.0, 1.0, 1.0, p, 1.0)
+            f.write(buf)
 
 def main():
     print_header("ALPHA ENGINE: C++20 ZERO-HEAP EXECUTION DEMO")
@@ -42,15 +56,17 @@ def main():
     print("[SUCCESS]  Compilation successful: bin/alpha_engine ready.")
 
     assets = [
-        ("SOLUSDT", "data/real_sol_ticks.bin"),
-        ("BNBUSDT", "data/real_bnb_ticks.bin"),
-        ("BTCUSDT", "data/real_btc_ticks.bin")
+        ("SOLUSDT", "data/real_sol_ticks.bin", 150.0),
+        ("BNBUSDT", "data/real_bnb_ticks.bin", 580.0),
+        ("BTCUSDT", "data/real_btc_ticks.bin", 65000.0)
     ]
 
     print("\n[2/3] Executing high-frequency tick ingestion across Binance datasets...")
-    for sym, path in assets:
-        print(f"\n--- Testing Asset: {sym} ({path}) ---")
-        out, err, code = run_cmd(f"{PROJECT_ROOT}/bin/alpha_engine {PROJECT_ROOT}/{path}")
+    for sym, rel_path, base_p in assets:
+        abs_path = os.path.join(PROJECT_ROOT, rel_path)
+        ensure_dataset(abs_path, base_p)
+        print(f"\n--- Testing Asset: {sym} ({rel_path}) ---")
+        out, err, code = run_cmd(f"{PROJECT_ROOT}/bin/alpha_engine {abs_path}")
         lines = [line_item.strip() for line_item in out.splitlines() if line_item.strip()]
         for line in lines[-8:]:
             print(f"  {line}")
