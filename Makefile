@@ -97,7 +97,11 @@ lint:
 	/Users/ishantpanchal/.local/bin/ruff check tests/ scripts/
 	python3 scripts/audit_safety_invariants.py
 
-clean:
-	rm -rf bin/ *.dSYM metrics.json .pytest_cache
+audit-iso9001:
+	@echo "=== Verifying AlphaEngine Against ISO/DIS 9001:2026 Standards ==="
+	python3 scripts/audit_iso9001_compliance.py
 
-.PHONY: all live test asan scan tidy coverage fuzz semgrep stress qa demo clean lint
+clean:
+	rm -rf bin/ *.dSYM metrics.json .pytest_cache target/
+
+.PHONY: all live test asan scan tidy coverage fuzz semgrep stress qa demo clean lint audit-iso9001

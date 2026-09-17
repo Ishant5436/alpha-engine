@@ -12,3 +12,4 @@ metrics.json
 *.log
 logs/
 *.jsonl
+target/
