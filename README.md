@@ -71,6 +71,7 @@ Compliance is mechanically verified via `scripts/audit_safety_invariants.py` in 
 * **Throughput:** **> 98,000,000 ticks/second** (~10.1 nanoseconds per tick latency).
 * **Quant Alpha:** **+12.04% Total Return** with a **Profit Factor of 2.12** and **1.58% Maximum Drawdown**.
 * **Risk Circuit Breaker:** Hard stop-loss triggers at strictly **4.00% max drawdown**, guaranteeing protection against tail-risk black swans.
+* **Institutional Heavy-Load Stress Test:** See [`BENCHMARKS.md`](BENCHMARKS.md) for the complete 100,000-tick stress-test report (672,189 ticks/s pipe execution, +1.58 MB RSS Delta, 100% FLAT state residency).
 
 ---
 
