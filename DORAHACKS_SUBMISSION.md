@@ -1,10 +1,10 @@
-# WEEX AI Wars II — DoraHacks Submission Package
+# WEEX AI Wars II -- DoraHacks Submission Package
 
 **Hackathon:** WEEX AI Wars II: Rise of Intelligence  
 **Prize Pool:** $200,000 USDT / USDC  
 **BUIDL Profile:** [#48230](https://dorahacks.io/buidl/48230)  
 **Submission ID:** 54207  
-**Track:** Team AI — Quantitative Trading & Autonomous AI Agents  
+**Track:** Team AI -- Quantitative Trading & Autonomous AI Agents  
 **Author:** Ishant Panchal (`Ishant5436` / `ishant.p@somaiya.edu`)  
 **Repository:** [https://github.com/Ishant5436/alpha-engine](https://github.com/Ishant5436/alpha-engine)  
 **Promotional Announcement:** [https://x.com/IshantP38294/status/2100263972473889257](https://x.com/IshantP38294/status/2100263972473889257)  
@@ -13,8 +13,8 @@
 
 ## 1. Project Overview
 
-* **Project Title:** AlphaEngine: Zero-Heap C++20 High-Frequency Execution Core & WEEX Trader Skill
-* **Tagline:** Ultra-low-latency, deterministic algorithmic trading engine processing >123,000,000 ticks/sec with institutional friction modeling, 2.0% daily drawdown circuit breaker, and Rule 127-compliant FastMCP Trader Skill.
+* **Project Title:** AlphaEngine: C++20 Execution Core & WEEX Trader MCP Skill
+* **Tagline:** High-throughput quantitative trading core with exchange friction modeling, 2.0% daily drawdown circuit breaker, and FastMCP tool interfaces.
 * **Category:** Algorithmic Trading / Quantitative Finance / AI Agent Infrastructure
 
 ---
@@ -24,7 +24,7 @@ Most retail algorithmic trading bots and open-source backtesters fail in live cr
 1. **Spread & Fee Oblivion:** Ignoring institutional exchange taker fees (4.0 bps per side) and bid/ask slippage, causing strategies to churn and bleed capital in choppy market regimes.
 2. **Dynamic Memory Latency Spikes:** Frequent heap allocations (`new`/`malloc`) on the hot execution path causing non-deterministic latency spikes during high volatility.
 3. **Unchecked Drawdowns:** Lack of deterministic, hard-wired circuit breakers that halt trading before catastrophic drawdowns occur.
-4. **Agent Integration Friction:** Lack of standardized, safety-checked tool interfaces for autonomous LLM agents to monitor risk and execute trades safely.
+4. **Agent Integration Friction:** Lack of standardized, safety-checked tool interfaces for autonomous trading agents to monitor risk and execute trades safely.
 
 ---
 
@@ -36,7 +36,7 @@ Most retail algorithmic trading bots and open-source backtesters fail in live cr
 * **Volatility-Gated Multi-Horizon Signal:** Combines multi-frequency exponential moving averages (Fast 50-tick, Medium 250-tick, Slow 1,250-tick) with real-time Parkinson realized volatility estimation. In choppy/low-volatility regimes, the engine strictly halts trading (`State: FLAT`), eliminating 95%+ of taker fee drag.
 * **Competition Stability Shield:** Dedicated multi-metric risk controller with a hard 2.0% daily drawdown circuit breaker that locks trading into 100% FLAT state upon breach and enforces $\ge 80\%$ FLAT state residency.
 * **WEEX V3 Live Execution Gateway:** Non-blocking async Python daemon (`scripts/weex_gateway.py`) with HMAC-SHA256 request signing, Token-Bucket rate limiting (40 reqs/min), and real-time pipe communication.
-* **Rule 127-Compliant WEEX Trader Skill (FastMCP):** Standardized Model Context Protocol server (`scripts/weex_mcp_server.py`) exposing risk-gated tools (`weex_ticker`, `weex_orderbook`, `weex_stability_shield_status`, `weex_risk_gated_order`) for autonomous AI agents.
+* **WEEX Trader Skill (FastMCP):** Standardized Model Context Protocol server (`scripts/weex_mcp_server.py`) exposing risk-gated tools (`weex_ticker`, `weex_orderbook`, `weex_stability_shield_status`, `weex_risk_gated_order`) for autonomous AI agents.
 
 ```mermaid
 graph TD
@@ -48,7 +48,7 @@ graph TD
     F --> G[Competition Stability Shield: 2% DD Circuit Breaker]
     G -->|Risk Intact| H[HMAC-SHA256 Signed Limit Orders -> WEEX V3 REST]
     G -->|DD >= 2.0%| I[Circuit Breaker Lock -> 100% FLAT until 00:00 UTC]
-    J[AI Agents: Claude / Gemini / Cursor] -->|FastMCP / Rule 127| K[scripts/weex_mcp_server.py]
+    J[Autonomous Agents / External Clients] -->|FastMCP| K[scripts/weex_mcp_server.py]
     K --> G
 ```
 
@@ -64,7 +64,7 @@ Benchmarked on 500,000 real consecutive historical trades directly from public e
   Processed Ticks          : 500,000 (Real Consecutive Ticks)
   Throughput (Ticks/sec)   : 123,967,966 ticks/sec (~8.06 ns/tick)
   Total Return (%)         : +12.04%
-  Raw Per-Era Sharpe (μ/σ) : 0.0778
+  Raw Per-Era Sharpe (mean/std) : 0.0778
   Maximum Drawdown (%)     : 1.58% (Strictly below 2.00% Competition Limit)
   Exchange Taker Fee Rate  : 4.0 bps per fill + half-spread slippage modeled
   Dynamic Heap Allocs      : 0 (Zero Allocations on Hot Execution Path)
@@ -75,9 +75,9 @@ Benchmarked on 500,000 real consecutive historical trades directly from public e
 
 ---
 
-## 5. Power of 10 Deterministic Safety Invariants Audit
+## 5. Safety-Critical Code Invariants & Memory Bounds
 
-The engine strictly satisfies Gerard J. Holzmann's Power of 10 Safety Invariants:
+The engine satisfies static verification constraints:
 
 | Invariant | Standard Enforced | Implementation Evidence |
 | :--- | :--- | :--- |
@@ -94,15 +94,15 @@ The engine strictly satisfies Gerard J. Holzmann's Power of 10 Safety Invariants
 
 ---
 
-## 6. Official WEEX AI Wars Trader Skill (FastMCP Tools)
+## 6. WEEX Trader Skill (FastMCP Tools)
 
-Satisfies WEEX AI Wars II Rule 127 (*"Install the official WEEX AI Wars Trader Skill and connect an AI agent"*):
+Implements the WEEX AI Wars II trader tool interfaces for agentic workflows:
 
 | Tool Name | Scope | Capability | Safety Check |
 | :--- | :--- | :--- | :--- |
 | `weex_ticker` | Public Market Data | Fetches live market price, 24h high/low, and volume. | Positive price and non-empty symbol validation. |
 | `weex_orderbook` | Public Market Data | L2 orderbook depth and real-time bid/ask spread (bps). | Depth bounded [1, 100]; spread bps calculated. |
-| `weex_stability_shield_status` | Risk Telemetry | Telemetry for daily drawdown %, peak equity, and flat ratio. | Power of 10 assertions; deterministic JSON output. |
+| `weex_stability_shield_status` | Risk Telemetry | Telemetry for daily drawdown %, peak equity, and flat ratio. | Bounded assertions; deterministic JSON output. |
 | `weex_risk_gated_order` | Execution | Dispatches limit order to WEEX V3 Contract API. | Pre-flight circuit breaker gate; dry-run safe mode. |
 | `weex_account_balance` | Private Account | Queries equity, unrealized PnL, and balance. | Masked credentials; zero secret leaks in responses. |
 | `weex_cancel_order` | Execution | Cancels open active orders. | Parameter sanitization and dry-run confirmation. |

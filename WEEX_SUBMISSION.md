@@ -1,4 +1,4 @@
-# WEEX AI Wars II: Rise of Intelligence — Submission Package
+# WEEX AI Wars II: Rise of Intelligence -- Submission Package
 
 **Hackathon:** WEEX AI Wars II  
 **Prize Pool:** $200,000 USDT / USDC  
@@ -10,8 +10,8 @@
 
 ## 1. Project Overview
 
-* **Project Title:** AlphaEngine: Zero-Heap C++20 High-Frequency Quantitative Execution Core
-* **Tagline:** High-throughput, deterministic algorithmic trading engine processing >14,000,000 ticks/sec with institutional friction modeling and Power of 10 safety invariants.
+* **Project Title:** AlphaEngine: C++20 Quantitative Execution Core
+* **Tagline:** Modular algorithmic trading engine with realistic exchange fee modeling, volatility regime detection, and static memory allocation.
 * **Category:** Algorithmic Trading / Quantitative Finance / AI Agent Infrastructure
 
 ---
@@ -27,25 +27,25 @@ Most retail algorithmic trading bots and open-source backtesters fail in live cr
 
 ## 3. The Architecture: AlphaEngine Solution
 
-`AlphaEngine` is an ultra-low-latency, zero-allocation C++20 quantitative trading engine engineered for high-frequency crypto asset markets:
+`AlphaEngine` is a C++20 quantitative execution core engineered for volatile cryptocurrency spot markets:
 
 * **Zero-Heap Circular Buffer:** Fixed-capacity `MarketDataRingBuffer<2048>` providing strictly $O(1)$ push/pop and real-time VWAP calculations with 0 dynamic heap allocations after initialization.
 * **Volatility-Gated Multi-Horizon Signal:** Combines multi-frequency exponential moving averages (Fast 50-tick, Medium 250-tick, Slow 1,250-tick) with real-time Parkinson realized volatility estimation. In choppy regimes, the engine strictly halts trading (`State: FLAT`), eliminating 95%+ of fee drag.
 * **Institutional Friction Modeling:** Explicitly models real-world exchange execution costs (4.0 bps taker fees per fill + half-spread slippage).
-* **Deterministic Safety Invariants:** Adheres strictly to Deterministic Safety Invariants (Power of 10 Rules: functions $\le 60$ lines, assertion density $\ge 2$, bounded loops, zero preprocessor macros).
+* **Memory Safety & Control Flow:** Fixed-capacity data structures, bounded loop iterations, checked function returns, and zero dynamic memory allocations on the evaluation path.
 
 ```
 Binance Market Tick Stream (BTC / ETH / SOL / BNB)
-                   │
-                   ▼
+                   |
+                   v
        Zero-Heap Ring Buffer O(1)
-                   │
-                   ▼
+                   |
+                   v
      Parkinson Realized Volatility Filter
-      ├── (Chop Regime: Vol < 1.5 bps) ──► State: FLAT (0 Fees / 0 Drawdown)
-      └── (Volatility Expansion)        ──► Triple-EMA Alignment (Fast/Med/Slow)
-                                                    │
-                                                    ▼
+      +-- (Chop Regime: Vol < 1.5 bps) --> State: FLAT (0 Fees / 0 Drawdown)
+      +-- (Volatility Expansion)       --> Triple-EMA Alignment (Fast/Med/Slow)
+                                                    |
+                                                    v
                                      Discrete Position Manager & 3:1 R:R
 ```
 
