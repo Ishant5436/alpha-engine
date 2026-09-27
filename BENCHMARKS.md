@@ -49,7 +49,7 @@ Direct C++20 engine execution measuring ring buffer ingestion, dual-window EMA u
 
 | Metric | Measured Value | Standard / Ceiling | Status |
 | :--- | :--- | :--- | :--- |
-| **Ingestion & VWAP Throughput** | **130,862,646 ticks/sec** | $\ge 10,000,000$ ticks/s | **PASS ($13\times$ margin)** |
+| **Ingestion & VWAP Throughput** | **125,919,210 ticks/sec** | $\ge 10,000,000$ ticks/s | **PASS ($12\times$ margin)** |
 | **Per-Tick Processing Latency** | **7.64 nanoseconds** | $\le 100.0$ ns | **PASS** |
 | **Hot-Path Heap Allocations** | **0 calls (`malloc`/`new`)** | 0 dynamic allocations | **PASS (Rule 3)** |
 | **Memory Leak Count (ASan)** | **0 bytes** | 0 leaks | **PASS (Clean)** |

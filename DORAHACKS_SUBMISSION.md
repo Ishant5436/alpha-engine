@@ -62,7 +62,7 @@ Benchmarked on 500,000 real consecutive historical trades directly from public e
                  STRATEGY PERFORMANCE REPORT
 =============================================================
   Processed Ticks          : 500,000 (Real Consecutive Ticks)
-  Throughput (Ticks/sec)   : 123,967,966 ticks/sec (~8.06 ns/tick)
+  Throughput (Ticks/sec)   : 125,919,210 ticks/sec (~7.94 ns/tick)
   Total Return (%)         : +12.04%
   Raw Per-Era Sharpe (mean/std) : 0.0778
   Maximum Drawdown (%)     : 1.58% (Strictly below 2.00% Competition Limit)
@@ -118,7 +118,7 @@ Running AlphaEngine Test Suite
   [PASS] test_ring_buffer_overflow_and_circularity
   [PASS] test_alpha_engine_signal_generation
   [PASS] test_risk_manager_drawdown_killswitch
-  [PASS] test_end_to_end_backtester (Speed: 123,967,966 ticks/sec)
+  [PASS] test_end_to_end_backtester (Speed: 125,919,210 ticks/sec)
 All Unit Tests Passed (5/5)
 
 === Running White-Box Invariant Test Suite ===
