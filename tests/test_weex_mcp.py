@@ -1,6 +1,6 @@
 """
 Unit Tests for WEEX AI Wars Trader Skill FastMCP Server
-Validates tool definitions, deterministic responses, Power of 10 invariants,
+Validates tool definitions, deterministic responses, safety invariants,
 and dry-run execution safety.
 """
 import json

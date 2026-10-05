@@ -29,7 +29,7 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
   - *Throughput SLA:* Tick ingestion and VWAP processing speed exceeding 10,000,000 ticks/sec (benchmark achieved: >120,000,000 ticks/sec).
   - *Memory Safety:* Zero memory leaks, zero buffer overruns, zero undefined behavior verified under AddressSanitizer and UndefinedBehaviorSanitizer.
   - *Risk Containment:* Hard-coded global killswitch triggering immediate position liquidation upon hitting the maximum drawdown ceiling (default 5.0%).
-  - *Power of 10 Invariants:* 100% compliance with Gerard J. Holzmann's safety-critical coding standards (functions $\le 60$ lines, assertion density $\ge 2$).
+  - *Deterministic Safety Standards:* 100% compliance with deterministic safety-critical coding standards (functions $\le 60$ lines, assertion density $\ge 2$).
 
 ---
 
@@ -38,7 +38,7 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
   - C++ Compiler: Clang++ supporting C++20 (`-std=c++20`).
   - Runtime Sanitizers: LLVM AddressSanitizer (`-fsanitize=address`) & UBSan (`-fsanitize=undefined`).
   - Python Environment: Python 3.14 with pytest, anyio, and fastmcp.
-  - Static AST Analyzers: Python AST validator for Power of 10 safety invariants.
+  - Static AST Analyzers: Python AST validator for Deterministic Safety Standards invariants.
 - **7.2 Competence & Training:** Full technical architecture and execution guides documented in [`README.md`](file:///Users/ishantpanchal/alpha-engine/README.md) and [`ARCHITECTURE.md`](file:///Users/ishantpanchal/alpha-engine/ARCHITECTURE.md).
 - **7.5 Documented Information:** Test reports, sanitizer output, and AST analyzer matrices are retained as verification artifacts.
 

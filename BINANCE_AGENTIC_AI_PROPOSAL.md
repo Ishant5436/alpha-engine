@@ -21,7 +21,7 @@
 * **Major:** Computer Engineering
 * **Graduation Year:** 2026
 * **Prior Experience:**
-  Architected zero-heap C++20 algorithmic execution core (`alpha-engine`) benchmarked at >20,000,000 ticks/sec across Binance Spot tick histories; engineered multi-target orthogonal ensemble pipelines with linear feature neutralization for the Numerai tournament; built production FastMCP execution gateways with Power of 10 safety invariants and EIP-712 cryptographic permit signing.
+  Architected zero-heap C++20 algorithmic execution core (`alpha-engine`) benchmarked at >20,000,000 ticks/sec across Binance Spot tick histories; engineered multi-target orthogonal ensemble pipelines with linear feature neutralization for the Numerai tournament; built production FastMCP execution gateways with Deterministic Safety Standards and EIP-712 cryptographic permit signing.
 
 ---
 
@@ -30,7 +30,7 @@
 
 Most algorithmic agents fail in production because they treat trading as text completion: they ignore exchange taker fees (4.0 bps per fill), incur slippage in choppy market regimes, and bleed capital via high-frequency churning. `AlphaEngine Core` deploys a two-tier decoupled architecture:
 1. **The Reasoning Layer (Cognitive Plane):** A reasoning agent that ingests Binance Web3 tick feeds, order book depth, and liquidity microstructure, synthesizing macro regime classification into probabilistic directional hypotheses.
-2. **The Execution & Risk Core (Deterministic Plane):** A compiled, zero-heap C++20/Rust execution engine adhering to Gerard J. Holzmann's Power of 10 Safety Invariants. 
+2. **The Execution & Risk Core (Deterministic Plane):** A compiled, zero-heap C++20/Rust execution engine adhering to Deterministic Safety Standards. 
 
 The agent operates under an asymmetric volatility deadband: in low-volatility consolidation regimes, the engine strictly forces a 100% `FLAT` state, eliminating 95%+ of spread friction. When Parkinson realized volatility indicates expansion, the reasoning layer initiates trades gated by a hard 3:1 reward-to-risk ratio, Kelly-derived fractional position sizing, and an immutable Keccak256 execution audit log. The system runs autonomously with zero human intervention and 100% deterministic reproducibility.
 

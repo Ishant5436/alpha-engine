@@ -100,7 +100,7 @@
   Standard LLM-powered trading agents fail in production because probabilistic language models treat financial markets as unconstrained text generation. They suffer from execution desynchronization, ignore institutional exchange fees (4.0 bps per fill), incur severe churn in consolidation regimes, and lack hard deterministic boundaries.
 </p>
 <p>
-  <b>AlphaEngine Core</b> solves this via a decoupled two-tier architecture: an <i>LLM Perception & Reasoning Layer</i> interacting with a compiled, zero-heap <i>C++20/Rust Deterministic Execution Engine</i> adhering to Gerard J. Holzmann's Power of 10 Safety Invariants. The system enforces strict volatility gating, spending &gt;80% of all intervals in a 100% FLAT state to guarantee friction immunity.
+  <b>AlphaEngine Core</b> solves this via a decoupled two-tier architecture: an <i>LLM Perception & Reasoning Layer</i> interacting with a compiled, zero-heap <i>C++20/Rust Deterministic Execution Engine</i> adhering to Deterministic Safety Standards. The system enforces strict volatility gating, spending &gt;80% of all intervals in a 100% FLAT state to guarantee friction immunity.
 </p>
 
 <h2>2. End-to-End System Pipeline</h2>
@@ -121,7 +121,7 @@
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
 │                           DETERMINISTIC EXECUTION CORE (Zero-Heap C++20)                    │
 │   Discrete Position State Machine (LONG / FLAT / SHORT)  &bull;  Fractional Kelly Position Sizing  │
-│   Power of 10 Safety Invariants (&le;60 lines/fn, &ge;2 asserts/fn)  &bull;  4.0% Hard Circuit Breaker     │
+│   Deterministic Safety Standards (&le;60 lines/fn, &ge;2 asserts/fn)  &bull;  4.0% Hard Circuit Breaker     │
 └──────────────────────────────────────────────┬──────────────────────────────────────────────┘
                                                │ Authenticated Binance Web3 REST / Relay
                                                ▼
@@ -164,7 +164,7 @@
 </table>
 
 <div class="highlight-box">
-  <b>Power of 10 Deterministic Safety Invariants:</b> All execution routines are bounded under 60 lines, maintain assertion density &ge; 2, use no recursion or unbounded loops, and execute without dynamic heap allocation after system bootstrap.
+  <b>Deterministic Safety Standards:</b> All execution routines are bounded under 60 lines, maintain assertion density &ge; 2, use no recursion or unbounded loops, and execute without dynamic heap allocation after system bootstrap.
 </div>
 
 <div class="footer">

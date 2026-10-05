@@ -276,7 +276,7 @@ def build_weex_order_payload(signal_line: str) -> Dict[str, Any]:
 class CompetitionStabilityShield:
     """
     Multi-Metric Competition Risk Shield for WEEX AI Wars II.
-    Enforces Gerard J. Holzmann's Power of 10 Safety Invariants:
+    Enforces Deterministic Safety Standards:
     1. Bounded daily drawdown circuit breaker (default: 2.0%).
     2. Atomic position flattening to 100% FLAT upon breach.
     3. Inactivity tracking to enforce >= 80% time in FLAT state to avoid exchange taker fee drag.
@@ -399,7 +399,7 @@ class ResilientWebSocketStreamer:
     """
     Resilient WebSocket Market Data Streamer with Automatic Reconnect and Feed Failover.
     Supports WEEX V3 Contract WS (primary) and Binance Spot WS (failover).
-    Power of 10 Safety Invariants:
+    Deterministic Safety Standards:
     - Bounded exponential backoff (1.0s to 30.0s).
     - Hard limit on consecutive failure attempts before failover (3 attempts).
     - Every method <= 60 lines, assertion density >= 2.

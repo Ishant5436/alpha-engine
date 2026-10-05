@@ -39,7 +39,7 @@ def ensure_dataset(filepath: str, base_price: float) -> None:
 def main():
     print_header("ALPHA ENGINE: C++20 ZERO-HEAP EXECUTION DEMO")
     print("• Target Architecture: Apple Silicon ARM64 (M5 Pro)")
-    print("• Constraints: Deterministic Safety Invariants (Power of 10 Rules)")
+    print("• Constraints: Deterministic Safety Standards (Memory & Control Invariants)")
     print("• Hot Path Memory: 0 Dynamic Heap Allocations (O(1) Ring Buffer)")
     print("• Friction: 4.0 bps Exchange Taker Fee + Half-Spread Slippage\n")
 

@@ -6,7 +6,7 @@ Empirically proves institutional production-readiness under heavy load:
 2. High-throughput pipe execution (> 50,000 ticks/second)
 3. Deterministic circuit-breaker activation upon flash crash (3.5% drawdown)
 4. Non-corrupted append-only execution journaling (JSONL schema compliance)
-Adheres to Gerard J. Holzmann's Power of 10 Safety Invariants.
+Adheres strictly to Deterministic Safety Standards.
 """
 import asyncio
 import json
