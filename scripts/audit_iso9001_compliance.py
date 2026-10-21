@@ -41,8 +41,8 @@ def audit_clause_4():
 def audit_clause_5():
     """Clause 5: Leadership & Quality Culture"""
     checks = {
-        "quality_manual_present": file_exists("iso9001_compliance/QUALITY_MANUAL.md"),
-        "zero_defect_policy_stated": file_contains("iso9001_compliance/QUALITY_MANUAL.md", "Zero Completion Claims Without Verification"),
+        "quality_manual_present": file_exists("docs/quality/QUALITY_MANUAL.md"),
+        "zero_defect_policy_stated": file_contains("docs/quality/QUALITY_MANUAL.md", "Zero Completion Claims Without Verification"),
         "makefile_pipeline_gated": file_contains("Makefile", "test: bin/test_runner bin/test_whitebox"),
     }
     return {
@@ -54,7 +54,7 @@ def audit_clause_5():
 def audit_clause_6():
     """Clause 6: Planning & Risk-Based Thinking"""
     checks = {
-        "risk_register_maintained": file_exists("iso9001_compliance/RISK_REGISTER.md"),
+        "risk_register_maintained": file_exists("docs/quality/RISK_REGISTER.md"),
         "drawdown_killswitch_implemented": file_contains("include/risk_manager.hpp", "position_.is_liquidated = true"),
         "zero_volume_division_guard": file_contains("include/market_data.hpp", "cumulative_volume_ <= 0.0"),
         "dry_run_safety_guard": file_contains("scripts/weex_gateway.py", "self.dry_run = dry_run"),
@@ -82,7 +82,7 @@ def audit_clause_7():
 def audit_clause_8():
     """Clause 8: Operation & Software Verification/Validation (V&V)"""
     checks = {
-        "traceability_matrix_present": file_exists("iso9001_compliance/TRACEABILITY_MATRIX.md"),
+        "traceability_matrix_present": file_exists("docs/quality/TRACEABILITY_MATRIX.md"),
         "unit_test_suite_present": file_exists("tests/test_runner.cpp"),
         "whitebox_invariant_suite_present": file_exists("tests/test_whitebox.cpp"),
         "python_gateway_test_suite_present": file_exists("tests/test_weex_gateway.py"),

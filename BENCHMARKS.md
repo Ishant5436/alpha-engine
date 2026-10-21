@@ -1,5 +1,4 @@
-# AlphaEngine: Institutional Performance & Stress-Test Benchmarks
-## High-Frequency Execution & WEEX AI Wars II Stability Metrics
+# AlphaEngine Benchmarks
 
 ---
 

@@ -94,7 +94,7 @@ demo: all
 	@python3 scripts/record_demo_walkthrough.py
 
 lint:
-	/Users/ishantpanchal/.local/bin/ruff check tests/ scripts/
+	ruff check tests/ scripts/
 	python3 scripts/audit_safety_invariants.py
 
 audit-iso9001:

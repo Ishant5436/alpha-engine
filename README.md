@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/alpha_engine_logo.png" alt="AlphaEngine logo" width="160">
+</p>
+
 # AlphaEngine
 
 [![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
@@ -78,8 +82,8 @@ include/   Header-only C++20 data structures and engine
 src/        Entry points (main, live trader)
 tests/      C++ unit/whitebox tests + Python integration tests
 scripts/    Python tooling: data generation, live paper trading, audits
-docs/       Design notes
-archive/    Earlier hackathon submission write-ups (historical)
+docs/       Quality docs: risk register, traceability matrix
+archive/    Earlier hackathon write-ups and scripts (historical)
 ```
 
 ## Optional: Live Paper Trading

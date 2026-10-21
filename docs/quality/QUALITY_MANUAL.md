@@ -12,7 +12,7 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
 - **4.1 Organizational Context & Computing Architecture:** The engine operates on Apple Silicon ARM64 architecture (Darwin macOS), utilizing optimized C++20 instructions (`-O3 -march=native`) and zero-heap hot paths for predictable deterministic execution.
 - **4.2 Stakeholder Expectations:** Exchange venues (WEEX, Binance), liquidity providers, and trading operators require zero unhandled panics, zero memory leaks, sub-microsecond tick processing, and strict risk limits.
 - **4.3 Scope of the QMS:** Covers all C++20 core execution components (`RingBuffer`, `AlphaEngine`, `RiskManager`, `WelfordAccumulator`, `MonotonicQueue`), Python gateway services (`WeexGateway`, `StabilityShield`), and FastMCP tool interfaces (`WeexMCPServer`).
-- **4.4 QMS and Automated Verification:** Quality gates are encapsulated as executable targets in [`Makefile`](file:///Users/ishantpanchal/alpha-engine/Makefile), integrating unit tests, whitebox invariant checks, ASan/UBSan sanitizers, and static AST analyzers.
+- **4.4 QMS and Automated Verification:** Quality gates are encapsulated as executable targets in [`Makefile`](../../Makefile), integrating unit tests, whitebox invariant checks, ASan/UBSan sanitizers, and static AST analyzers.
 
 ---
 
@@ -24,7 +24,7 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
 ---
 
 ### 4. Clause 6: Planning & Risk-Based Thinking
-- **6.1 Actions to Address Risks & Opportunities:** The QMS maintains an active [`RISK_REGISTER.md`](file:///Users/ishantpanchal/alpha-engine/iso9001_compliance/RISK_REGISTER.md) analyzing failure modes such as drawdown limit breaches, ring buffer overflows, floating-point drift, and exchange API rate limit penalties.
+- **6.1 Actions to Address Risks & Opportunities:** The QMS maintains an active [`RISK_REGISTER.md`](RISK_REGISTER.md) analyzing failure modes such as drawdown limit breaches, ring buffer overflows, floating-point drift, and exchange API rate limit penalties.
 - **6.2 Quality Objectives:**
   - *Throughput SLA:* Tick ingestion and VWAP processing speed exceeding 10,000,000 ticks/sec (benchmark achieved: >120,000,000 ticks/sec).
   - *Memory Safety:* Zero memory leaks, zero buffer overruns, zero undefined behavior verified under AddressSanitizer and UndefinedBehaviorSanitizer.
@@ -39,7 +39,7 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
   - Runtime Sanitizers: LLVM AddressSanitizer (`-fsanitize=address`) & UBSan (`-fsanitize=undefined`).
   - Python Environment: Python 3.14 with pytest, anyio, and fastmcp.
   - Static AST Analyzers: Python AST validator for Deterministic Safety Standards invariants.
-- **7.2 Competence & Training:** Full technical architecture and execution guides documented in [`README.md`](file:///Users/ishantpanchal/alpha-engine/README.md) and [`ARCHITECTURE.md`](file:///Users/ishantpanchal/alpha-engine/ARCHITECTURE.md).
+- **7.2 Competence & Training:** Full technical architecture and execution guides documented in [`README.md`](../../README.md) and [`ARCHITECTURE.md`](../../README.md).
 - **7.5 Documented Information:** Test reports, sanitizer output, and AST analyzer matrices are retained as verification artifacts.
 
 ---
@@ -55,8 +55,8 @@ This Quality Manual establishes the Software Quality Management System (QMS) pol
 
 ### 7. Clause 9: Performance Evaluation
 - **9.1 Monitoring & Measurement:** Continuous performance profiling of execution speed (`ticks/sec`) and memory residency.
-- **9.2 Internal Audit:** Automated static & runtime audit executed via [`scripts/audit_iso9001_compliance.py`](file:///Users/ishantpanchal/alpha-engine/scripts/audit_iso9001_compliance.py).
-- **9.3 Safety Auditing:** AST invariant checker [`scripts/audit_safety_invariants.py`](file:///Users/ishantpanchal/alpha-engine/scripts/audit_safety_invariants.py) analyzing all C++ source files.
+- **9.2 Internal Audit:** Automated static & runtime audit executed via [`scripts/audit_iso9001_compliance.py`](../../scripts/audit_iso9001_compliance.py).
+- **9.3 Safety Auditing:** AST invariant checker [`scripts/audit_safety_invariants.py`](../../scripts/audit_safety_invariants.py) analyzing all C++ source files.
 
 ---
 
