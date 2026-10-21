@@ -53,16 +53,16 @@ Mechanically verified in CI via [`scripts/audit_safety_invariants.py`](scripts/a
 
 ## Benchmarks
 
-Representative run on Apple Silicon (ARM64), 500k synthetic ticks:
+**Throughput:** ~120M ticks/sec (~8 ns/tick) on Apple Silicon (ARM64); ~55M ticks/sec on a cloud x86 VM. Measured over 500k in-memory ticks.
 
-```
-Processed Ticks        : 500,000
-Throughput             : ~120M ticks/sec  (~8 ns/tick)
-Max Drawdown           : 1.58%
-Profit Factor          : 2.12
-```
+**Reference strategy** (fast/slow EMA crossover, 1x leverage) on the bundled synthetic dataset (`scripts/generate_tick_dataset.py`, seed 42):
 
-Throughput is the headline systems metric. The strategy figures come from a synthetic backtest and are illustrative of the engine's plumbing, not a claim of live trading performance. See [`BENCHMARKS.md`](BENCHMARKS.md) for the full stress-test report.
+| Fees | Return | Max drawdown | Profit factor | Trades |
+| :--- | ---: | ---: | ---: | ---: |
+| 0 bps | +12.04% | 1.58% | 2.12 | 165 |
+| 4 bps taker (default) | −1.88% | 4.02% (kill switch tripped) | 1.33 | 165 |
+
+The strategy exists to exercise the pipeline end to end: signal, sizing, fills at bid/ask, fees, and the drawdown circuit breaker. It is not a profitable trading strategy, and the synthetic data is not market data. See [`BENCHMARKS.md`](BENCHMARKS.md) for the stress-test report.
 
 ## Build & Test
 
