@@ -1,121 +1,95 @@
-# AlphaEngine: High-Performance C++20 Algorithmic Trading Core
+# AlphaEngine
 
 [![CI](https://github.com/Ishant5436/alpha-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/Ishant5436/alpha-engine/actions)
-[![Tests](https://img.shields.io/badge/Tests-36%2F36%20Passed-brightgreen)](tests/)
-[![Throughput](https://img.shields.io/badge/Throughput-123.9M%20ticks%2Fsec-blue)](data/)
-[![AddressSanitizer](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20Leaks-purple)](Makefile)
-[![Safety Standard](https://img.shields.io/badge/Safety%20Standard-Deterministic%20Invariants-orange)](scripts/audit_safety_invariants.py)
-[![Announcement](https://img.shields.io/badge/X%20Announcement-BUIDL%20%2348230-black)](https://x.com/IshantP38294/status/2100263972473889257)
+![Tests](https://img.shields.io/badge/tests-36%2F36%20passing-brightgreen)
+![ASan + UBSan](https://img.shields.io/badge/ASan%20%26%20UBSan-0%20leaks-blueviolet)
+![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=cplusplus)
+![License](https://img.shields.io/badge/license-MIT-black)
 
-> **Target Competition:** WEEX AI Wars II: Rise of Intelligence ($200,000 Prize Pool — Team AI Track)  
-> **BUIDL Profile:** [#48230](https://dorahacks.io/buidl/48230)  
-> **1-Second Instant Demo:** `make demo`
+A high-performance C++20 core for low-latency market-data processing and quantitative backtesting. Built around zero-heap, cache-aware data structures with deterministic, statically-bounded execution on the hot path.
 
-![AlphaEngine Terminal Demo](assets/alpha_engine_demo.gif)
+![AlphaEngine terminal demo](assets/alpha_engine_demo.gif)
 
 ---
 
-## 1. System Architecture & Algorithmic Primitives
+## Highlights
 
-`AlphaEngine` is an ultra-low-latency, zero-heap quantitative execution and risk engine built for high-frequency cryptocurrency trading under extreme volatility.
+- **Zero heap allocation on the hot path** — static `std::array` ring buffers, no `new`/`malloc` after initialization.
+- **Cache-aware data structures** — `alignas(64)` L1 cache-line alignment and power-of-two bitmask wrapping.
+- **Deterministic safety invariants** — simple control flow, statically-bounded loops, and a mechanical audit script enforced in CI.
+- **Clean, warning-free build** — compiles under `-Wall -Wextra -Werror -pedantic -std=c++20 -O3`.
+- **Sanitizer-clean** — zero leaks under AddressSanitizer and UndefinedBehaviorSanitizer.
 
-### Data Structures & Algorithmic Complexity
+## Core Data Structures
 
-| Component | Primitive | Time Complexity | Space Complexity | Hardware & Cache Invariant |
+| Component | Primitive | Time | Space | Notes |
 | :--- | :--- | :---: | :---: | :--- |
-| **Market Data Ingestion** | `MarketDataRingBuffer` | $\mathcal{O}(1)$ push / query | $\mathcal{O}(C)$ static | `alignas(64)` L1 cache-line aligned; power-of-2 bitmask wrap (`tail & (Cap - 1)`). |
-| **Sliding Window Extrema** | `MonotonicQueue` | $\mathcal{O}(1)$ amortized | $\mathcal{O}(K)$ static | Circular monotonic deque tracking rolling high/low price boundaries without heap alloc. |
-| **Online Running Variance**| `WelfordAccumulator` | $\mathcal{O}(1)$ update | $\mathcal{O}(1)$ registers | Numerically stable single-pass variance: $M_{2,n} = M_{2,n-1} + (x_n - \bar{x}_{n-1})(x_n - \bar{x}_n)$. |
-| **Multi-Freq Alpha Signals** | Exponential Moving Avgs | $\mathcal{O}(1)$ step | $\mathcal{O}(1)$ scalar | Direct floating-point multiply-accumulate (FMA) register updates. |
-| **Circuit Breaker** | `DeterministicRiskManager` | $\mathcal{O}(1)$ step | $\mathcal{O}(1)$ scalar | Peak equity monotonic tracking with hard 4.0% drawdown liquidation lock. |
+| Market-data ingestion | `MarketDataRingBuffer` | O(1) push / query | O(C) static | `alignas(64)` cache-line aligned; power-of-two bitmask wrap (`tail & (Cap - 1)`). |
+| Sliding-window extrema | `MonotonicQueue` | O(1) amortized | O(K) static | Circular monotonic deque tracking rolling high/low without heap allocation. |
+| Online running variance | `WelfordAccumulator` | O(1) update | O(1) | Numerically stable single-pass variance (Welford's method). |
+| Moving averages | Exponential MA | O(1) step | O(1) | Register-level multiply-accumulate updates. |
+| Circuit breaker | `DeterministicRiskManager` | O(1) step | O(1) | Monotonic peak-equity tracking with a hard drawdown lock. |
 
----
+## Safety Invariants
 
-## 2. Safety Invariants Compliance Matrix
+Mechanically verified in CI via [`scripts/audit_safety_invariants.py`](scripts/audit_safety_invariants.py):
 
-Compliance is mechanically verified via `scripts/audit_safety_invariants.py` in CI/testing:
+| # | Invariant | Implementation |
+| :--- | :--- | :--- |
+| 1 | Simple control flow | No `goto`, `setjmp`, `longjmp`, or recursion |
+| 2 | Bounded loops | All loops have static compile-time bounds |
+| 3 | No dynamic memory on hot path | No `malloc`/`new` after initialization |
+| 4 | Function length limits | Every function ≤ 60 lines |
+| 5 | High assertion density | ≥ 2 invariant assertions per function |
+| 6 | Smallest-scope declarations | Variables declared at minimum necessary scope |
+| 7 | Checked returns & arguments | Return values and parameter bounds checked on entry |
+| 8 | Restricted preprocessor | No macro logic; `constexpr` and type traits instead |
+| 9 | Restricted pointers | Single-level dereferencing; no function pointers |
+| 10 | Zero-warning compilation | Clean under `-Wall -Wextra -Werror -pedantic` |
 
-| Rule | Safety Invariant Constraint | AlphaEngine Implementation | Mechanical Audit Status |
-| :--- | :--- | :--- | :--- |
-| **Rule 1** | Simple Control Flow | Zero `goto`, `setjmp`, `longjmp`, or recursion. | **Verified (0 violations)** |
-| **Rule 2** | Bounded Execution Loops | All loops have static compile-time bounds (`N <= MAX_RING_CAPACITY`). | **Verified (0 violations)** |
-| **Rule 3** | Zero Dynamic Memory on Hot Path | Zero `malloc` or `new` after initialization. Uses static `std::array` ring buffers. | **Verified (0 allocations)** |
-| **Rule 4** | Function Length Limits | Every function is strictly $\le 60$ lines of code. | **Verified (100% compliant)** |
-| **Rule 5** | High Assertion Density | Minimum $\ge 2$ invariant assertions per function validating numerical bounds. | **Verified (>= 2 asserts/fn)** |
-| **Rule 6** | Smallest Scope Declarations | All variables declared at minimum necessary scope. | **Verified** |
-| **Rule 7** | Return & Argument Checking | All return values and parameter bounds checked on entry. | **Verified** |
-| **Rule 8** | Restricted Preprocessor | Zero macro logic; uses C++20 `constexpr` and type traits. | **Verified (0 #defines)** |
-| **Rule 9** | Restricted Pointers | Single-level pointer dereferencing only; no function pointers. | **Verified** |
-| **Rule 10** | Pedantic Zero-Warning Compilation | Compiles cleanly with `-Wall -Wextra -Werror -pedantic -std=c++20 -O3`. | **Verified (0 compiler warnings)** |
+## Benchmarks
 
----
-
-## 3. Empirical Performance Benchmarks (Apple Silicon ARM64)
+Representative run on Apple Silicon (ARM64), 500k synthetic ticks:
 
 ```
-=============================================================
-                 STRATEGY PERFORMANCE REPORT
-=============================================================
-  Processed Ticks          : 500000
-  Throughput (Ticks/sec)   : 125919210
-  Total Return (%)         : +12.04%
-  Raw Per-Era Sharpe (μ/σ) : 0.0778
-  Annualized Sharpe Ratio  : 14.8239
-  Maximum Drawdown (%)     : 1.58%
-  Total Executed Trades    : 165
-  Win Rate (%)             : 37.58%
-  Profit Factor            : 2.12
-=============================================================
+Processed Ticks        : 500,000
+Throughput             : ~120M ticks/sec  (~8 ns/tick)
+Max Drawdown           : 1.58%
+Profit Factor          : 2.12
 ```
 
-* **Throughput:** **> 120,000,000 ticks/second** (~7.9 nanoseconds per tick latency).
-* **Quant Alpha:** **+12.04% Total Return** with a **Profit Factor of 2.12** and **1.58% Maximum Drawdown**.
-* **Risk Circuit Breaker:** Hard stop-loss triggers at strictly **4.00% max drawdown**, guaranteeing protection against tail-risk black swans.
-* **Institutional Heavy-Load Stress Test:** See [`BENCHMARKS.md`](BENCHMARKS.md) for the complete 100,000-tick stress-test report (672,189 ticks/s pipe execution, +1.58 MB RSS Delta, 100% FLAT state residency).
+Throughput is the headline systems metric. The strategy figures come from a synthetic backtest and are illustrative of the engine's plumbing, not a claim of live trading performance. See [`BENCHMARKS.md`](BENCHMARKS.md) for the full stress-test report.
 
----
-
-## 4. Quickstart & Verification
+## Build & Test
 
 ```bash
-# Clean, build, run unit tests, and execute static code analysis
 make clean
-make test
-
-# Build and execute high-frequency simulation on 500k ticks
-make all
+make test        # unit tests + static analysis
+make all         # optimized build
 ./bin/alpha_engine data/ticks_500k.bin
 ```
 
----
+Requires a C++20 compiler (Clang or GCC) and `make`. Python tooling for the optional live feed and scripts: `pip install -r requirements.txt`.
 
-## License
-MIT License. Open source for quantitative development and Web3 infrastructure.
+## Repository Layout
 
-## Real-Time Forward Paper Trading (Binance Spot Live Feed)
+```
+include/   Header-only C++20 data structures and engine
+src/        Entry points (main, live trader)
+tests/      C++ unit/whitebox tests + Python integration tests
+scripts/    Python tooling: data generation, live paper trading, audits
+docs/       Design notes
+archive/    Earlier hackathon submission write-ups (historical)
+```
 
-Stream real-world trade ticks in real-time from Binance Spot directly into the zero-heap C++ ring buffer:
+## Optional: Live Paper Trading
+
+Streams live ticks from Binance Spot into the C++ ring buffer for forward paper trading (no real orders):
 
 ```bash
-# Build and launch live paper trader on BTC/USDT (or ETHUSDT, SOLUSDT, BNBUSDT)
 python3 scripts/run_live_paper_trader.py BTCUSDT 10000.0
 ```
 
-Features real-time Parkinson volatility calculation, triple-horizon trend alignment, and simulated execution with 4.0 bps taker fee modeling in a live ANSI terminal dashboard.
+## License
 
----
-
-## WEEX V3 Gateway & FastMCP Trader Skill (Rule 127)
-
-Satisfies official WEEX AI Wars II guidelines for Team AI:
-* **Competition Stability Shield:** Hard 2.0% daily drawdown circuit breaker + $\ge 80\%$ FLAT state residency filter to eliminate taker fee churn.
-* **FastMCP Server (`weex-trader`):** Connects Claude, Gemini, and Cursor AI agents to WEEX contract trading tools:
-  * `weex_ticker`: Live prices & volatility
-  * `weex_orderbook`: Level 2 depth & spread
-  * `weex_stability_shield_status`: Risk telemetry & drawdown tracking
-  * `weex_risk_gated_order`: Pre-flight checked limit orders
-
-```bash
-# Launch WEEX Trader Skill FastMCP Server
-python3 scripts/weex_mcp_server.py
-```
+[MIT](LICENSE) © 2026 Ishant Panchal
